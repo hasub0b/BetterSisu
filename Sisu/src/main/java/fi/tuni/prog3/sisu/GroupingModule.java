@@ -1,13 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package fi.tuni.prog3.sisu;
 
 /**
+ * Describes a module containing other modules and/or courseunits.
  *
- * @author Jykae
+ * @author Jyri
  */
-public class GroupingModule {
+public class GroupingModule extends Module {
+
+    public GroupingModule(String name, String id, String groupId) {
+        super(name, id, groupId);
+    }
 
 }
