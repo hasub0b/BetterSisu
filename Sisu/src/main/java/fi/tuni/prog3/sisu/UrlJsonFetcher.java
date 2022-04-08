@@ -22,6 +22,7 @@ public class UrlJsonFetcher {
     
     /**
      * Get module JSON data by groupId
+     * @param groupId groupId of the module
      * @return JSON format string of module with groupId from SISU
      */
     public static String getModule(String groupId) {
@@ -30,12 +31,18 @@ public class UrlJsonFetcher {
     
     /**
      * Get course JSON data by groupId
+     * @param groupId groupId of the course
      * @return JSON format string of course with groupId from SISU
      */
     public static String getCourseUnit(String groupId) {
         return getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/course-units/by-group-id?groupId="+groupId+"&universityId=tuni-university-root-id");
     }
     
+    /**
+     * Get contents from given URL in string
+     * @param url URL to fetch string from
+     * @return String of contents from URL
+     */
     public static String getStringFromUrl(String url) {
         URL urlObj = null;
         InputStream input;
