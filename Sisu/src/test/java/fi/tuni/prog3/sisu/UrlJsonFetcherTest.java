@@ -34,9 +34,19 @@ public class UrlJsonFetcherTest {
     }
 
     @Test
-    public void testSomeMethod() {
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetDegrees() {
+        String testDegrees = UrlJsonFetcher.getDegrees();
+        assertTrue(testDegrees.endsWith("\"credits\":{\"min\":120,\"max\":null}}],\"truncated\":false,\"notifications\":null}"));
     }
     
+    @Test
+    public void testGetModule() {
+        String testModule = UrlJsonFetcher.getModule("otm-1d25ee85-df98-4c03-b4ff-6cad7b09618b");
+        assertTrue(testModule.endsWith("\"credits\":{\"min\":180,\"max\":null}}}"));
+    }
+    
+    @Test
+    public void testGetCourseUnit() {
+        
+    }
 }
