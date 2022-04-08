@@ -6,6 +6,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -32,6 +38,16 @@ public class UrlJsonFetcherTest {
     
     @AfterEach
     public void tearDown() {
+    }
+
+    @Test
+    public void testConnection() throws IOException {
+        URL urlObj = new URL("https://sis-tuni.funidata.fi/");
+        HttpURLConnection connection = (HttpURLConnection) urlObj.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+
+        assertEquals(200,connection.getResponseCode());
     }
 
     @Test
