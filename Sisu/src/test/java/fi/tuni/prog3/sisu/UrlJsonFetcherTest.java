@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
+ * Test JSON fetching from URL
+ * 
  * @author Leo
  */
 public class UrlJsonFetcherTest {
@@ -35,7 +36,7 @@ public class UrlJsonFetcherTest {
 
     @Test
     public void testGetDegrees() {
-        String testDegrees = UrlJsonFetcher.getDegrees();
+        String testDegrees = UrlJsonFetcher.getDegreeList();
         assertTrue(testDegrees.endsWith("\"credits\":{\"min\":120,\"max\":null}}],\"truncated\":false,\"notifications\":null}"));
     }
     
@@ -47,6 +48,7 @@ public class UrlJsonFetcherTest {
     
     @Test
     public void testGetCourseUnit() {
-        
+        String testCourseUnit = UrlJsonFetcher.getCourseUnit("otm-94ffcfc5-0db4-4507-b475-63f290639e04");
+        assertTrue(testCourseUnit.endsWith("\"inclusionApplicationInstruction\":null}]"));
     }
 }
