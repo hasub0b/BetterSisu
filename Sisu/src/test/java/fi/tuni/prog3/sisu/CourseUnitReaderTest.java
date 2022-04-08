@@ -50,8 +50,8 @@ public class CourseUnitReaderTest {
         try {
             String line = testBR.readLine();
             while (line != null) {
-                line = testBR.readLine();
                 jsonString += line;
+                line = testBR.readLine();
             }
         } catch (IOException e) {
             fail("File ended unexpectedly");
