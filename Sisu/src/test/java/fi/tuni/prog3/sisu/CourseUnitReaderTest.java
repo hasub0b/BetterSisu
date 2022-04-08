@@ -57,6 +57,9 @@ public class CourseUnitReaderTest {
             fail("File ended unexpectedly");
         }
         
+        // The files start and finish with a square bracket. Gson didn't like this
+        jsonString = jsonString.substring(1, jsonString.length()-1);
+        
         CourseUnitReader cur = new CourseUnitReader();
         CourseUnit testCU = cur.fromString(jsonString);
         
