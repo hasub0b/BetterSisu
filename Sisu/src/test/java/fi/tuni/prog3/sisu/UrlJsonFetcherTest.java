@@ -42,13 +42,13 @@ public class UrlJsonFetcherTest {
     
     @Test
     public void testGetModule() {
-        String testModule = UrlJsonFetcher.getModule("otm-1d25ee85-df98-4c03-b4ff-6cad7b09618b");
-        assertTrue(testModule.endsWith("\"credits\":{\"min\":180,\"max\":null}}}"));
+        String testModule = UrlJsonFetcher.getModule("uta-ok-ykoodi-41176");
+        assertTrue(testModule.endsWith("\"description\":null,\"allMandatory\":true}}]"));
     }
     
     @Test
     public void testGetCourseUnit() {
-        String testCourseUnit = UrlJsonFetcher.getCourseUnit("otm-94ffcfc5-0db4-4507-b475-63f290639e04");
+        String testCourseUnit = UrlJsonFetcher.getCourseUnit("uta-ykoodi-47926");
         assertTrue(testCourseUnit.endsWith("\"inclusionApplicationInstruction\":null}]"));
     }
 }
