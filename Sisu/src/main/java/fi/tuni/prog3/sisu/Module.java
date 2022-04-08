@@ -30,7 +30,7 @@ public abstract class Module {
      * Getter for module name
      * @return Name of module
      */
-    public String getName() {return name;    }
+    public String getName() {return name;}
 
     /**
      * Getter for module id
