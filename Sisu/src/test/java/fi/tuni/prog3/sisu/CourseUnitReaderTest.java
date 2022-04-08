@@ -50,7 +50,6 @@ public class CourseUnitReaderTest {
         try {
             String line = testBR.readLine();
             while (line != null) {
-                System.out.println(line);
                 line = testBR.readLine();
                 jsonString += line;
             }
