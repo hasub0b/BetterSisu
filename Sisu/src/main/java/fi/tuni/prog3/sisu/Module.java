@@ -15,13 +15,14 @@ public abstract class Module {
     String groupId;
     
     ArrayList<Module> subModules;
-    //ArrayList<> subUnits;
+    ArrayList<CourseUnit> subUnits;
 
     public Module(String name, String id, String groupId) {
         this.name = name;
         this.id = id;
         this.groupId = groupId;
         this.subModules = new ArrayList<>();
+        this.subUnits = new ArrayList<>();
     }
 
     public String getName() {
@@ -42,5 +43,9 @@ public abstract class Module {
     
     public void addSubModule(Module sub) {
         subModules.add(sub);
+    }
+    
+    public void addSubUnit(CourseUnit sub) {
+        subUnits.add(sub);
     }
 }
