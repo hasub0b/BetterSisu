@@ -51,6 +51,12 @@ public abstract class Module {
     public ArrayList<Module> getSubModules() {return subModules;}
     
     /**
+     * Getter for sub-units
+     * @return All sub-units of this module
+     */
+    public ArrayList<CourseUnit> getSubUnits() {return subUnits;}
+    
+    /**
      * Add a module to this module's sub-modules
      * @param sub Sub-module to add
      */
