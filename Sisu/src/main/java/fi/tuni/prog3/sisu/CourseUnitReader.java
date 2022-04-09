@@ -38,7 +38,6 @@ public class CourseUnitReader {
             fi_name = fi_name_element.getAsString();
         }
         
-        
         // code
         JsonElement codeElement = rootElement.get("code");
         String code = codeElement.getAsString();
