@@ -41,13 +41,16 @@ public class CourseUnitReader {
         JsonElement creditElement = null;
         int credits = 0;
         if (creditsObject.has("max")) {
-            JsonElement CreditElement = creditsObject.getAsJsonObject().get("max");
-            credits = CreditElement.getAsInt();
+            creditElement = creditsObject.getAsJsonObject().get("max");
+            if ( !creditElement.isJsonNull() ) {
+                credits = creditElement.getAsInt();
+            }
         } else if (creditsObject.has("min")) {
-            JsonElement CreditElement = creditsObject.getAsJsonObject().get("min");
-            credits = CreditElement.getAsInt();
+            creditElement = creditsObject.getAsJsonObject().get("min");
+            if ( !creditElement.isJsonNull() ) {
+                credits = creditElement.getAsInt();
+            }
         }
-        
         
         // course id
         JsonElement idElement = rootElement.get("id");
