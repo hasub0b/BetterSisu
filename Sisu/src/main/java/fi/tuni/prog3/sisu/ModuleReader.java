@@ -88,7 +88,10 @@ public class ModuleReader {
             }
         }
         
-        rules = rule.get("rules").getAsJsonArray();
+        // account for empty modules
+        if ( rule.get("rules") != null ) {
+            rules = rule.get("rules").getAsJsonArray();
+        }
         
         // Step 3: Initialize containers for result
         TreeMap<String, ArrayList<String>> result = new TreeMap<>();
