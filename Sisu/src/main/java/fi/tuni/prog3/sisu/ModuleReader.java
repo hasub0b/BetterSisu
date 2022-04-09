@@ -61,9 +61,10 @@ public class ModuleReader {
         // Step 2: Look for the actual sub-unit/module array...
         while ( true )  {
             if ( rule.get("type").getAsString().equals("CompositeRule") ) {
-                String subRulesType = rule.get("rules").getAsJsonArray().get(0).getAsJsonObject().get("type").getAsString();
-                if ( !subRulesType.equals("CourseUnitRule") && !subRulesType.equals("ModuleRule") ) {
-                    rule = rule.get("rules").getAsJsonArray().get(0).getAsJsonObject();
+                JsonObject subRules = rule.get("rules").getAsJsonArray().get(0).getAsJsonObject();
+                if ( !subRules.get("type").getAsString().equals("CourseUnitRule") && 
+                        !subRules.get("type").getAsString().equals("ModuleRule") ) {
+                    rule = subRules;
                 } else {
                     break;
                 }
