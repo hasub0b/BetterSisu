@@ -26,11 +26,18 @@ public class CourseUnitReader {
         JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
         
         // names
+        String fi_name = "Nimi ei saatavilla.";
+        String en_name = "Name unavailable";
         JsonElement namesElement = rootElement.get("name");
         JsonElement en_name_element = namesElement.getAsJsonObject().get("en");
-        String en_name = en_name_element.getAsString();
+        if ( en_name_element != null ) {
+            en_name = en_name_element.getAsString();
+        }
         JsonElement fi_name_element = namesElement.getAsJsonObject().get("fi");
-        String fi_name = fi_name_element.getAsString();
+        if ( fi_name_element != null ) {
+            fi_name = fi_name_element.getAsString();
+        }
+        
         
         // code
         JsonElement codeElement = rootElement.get("code");
