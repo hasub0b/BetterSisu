@@ -123,13 +123,19 @@ public class ModuleReaderTest {
         
         assertEquals(testCUName, "Training in Primary Health Care");
     }
-    
+
     @Test
     public void testView() {
-        String printTestId = "uta-tohjelma-1760";
         ModuleReader mr = new ModuleReader();
-        Module testDP = mr.fromSisu(printTestId);
+        Module testDP;
+        String groupId = "";
+        ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        //System.err.println(testDP.toString(""));
+        for ( int i = ids.size() - 20; i < ids.size(); i++ ) {
+            groupId = ids.get(i);
+            testDP = mr.fromSisu(groupId);
+            System.err.println(i + "\n");
+            System.err.println(testDP.toString(""));
+        }
     }
 }
