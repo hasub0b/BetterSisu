@@ -91,7 +91,6 @@ public class ModuleReader {
      */
     public TreeMap<String, ArrayList<String>> getSubGroupIds(String groupId) {
         JsonObject rootElement = gsonFromSisu(groupId);
-        String moduleType = rootElement.get("type").getAsString();
         JsonObject rule = rootElement.get("rule").getAsJsonObject();
         
         return extractSubGroupIds(rule);
