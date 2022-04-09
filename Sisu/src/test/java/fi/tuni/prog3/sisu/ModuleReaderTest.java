@@ -121,8 +121,6 @@ public class ModuleReaderTest {
         CourseUnit testCU = testDP.getSubModules().get(0).getSubUnits().get(0);
         String testCUName = testCU.getName();
         
-        System.err.println(testCUName);
-        
         assertEquals(testCUName, "Training in Primary Health Care");
     }
 }
