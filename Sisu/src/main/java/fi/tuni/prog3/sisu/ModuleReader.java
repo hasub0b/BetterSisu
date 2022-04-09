@@ -17,7 +17,7 @@ import java.util.TreeMap;
 public class ModuleReader {
     /**
      * Get a module from SISU using module groupId
-     * @param s Degree groupId
+     * @param groupId Degree groupId
      * @return Module of the given groupId
      */
     public Module fromSisu(String groupId) {
