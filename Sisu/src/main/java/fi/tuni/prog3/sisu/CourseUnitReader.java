@@ -26,7 +26,7 @@ public class CourseUnitReader {
         JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
         
         // names
-        String fi_name = "Nimi ei saatavilla.";
+        String fi_name = "Nimi ei ole saatavilla.";
         String en_name = "Name unavailable";
         JsonElement namesElement = rootElement.get("name");
         JsonElement en_name_element = namesElement.getAsJsonObject().get("en");
@@ -39,8 +39,11 @@ public class CourseUnitReader {
         }
         
         // code
+        String code = "code unavailable";
         JsonElement codeElement = rootElement.get("code");
-        String code = codeElement.getAsString();
+        if ( !codeElement.isJsonNull() ) {
+            code = codeElement.getAsString();
+        }
         
         // max credits. Accounts for funny business with credit amounts.
         JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
@@ -62,6 +65,10 @@ public class CourseUnitReader {
         JsonElement idElement = rootElement.get("id");
         String id = idElement.getAsString();
         
-        return new CourseUnit(id,groupId,en_name,code,credits);
+        if ( !en_name.equals("Name unavailable") ) {
+            return new CourseUnit(id,groupId,en_name,code,credits);
+        } else {
+            return new CourseUnit(id,groupId,fi_name,code,credits);
+        }
     }
 }
