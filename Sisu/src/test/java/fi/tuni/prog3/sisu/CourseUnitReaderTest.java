@@ -39,7 +39,20 @@ public class CourseUnitReaderTest {
     }
 
     @Test
-    public void testFromString() {
+    public void testFromSisu() {
+        CourseUnitReader cur = new CourseUnitReader();
+        CourseUnit testCU = cur.fromSisu("uta-ykoodi-47926");
+        
+        assertEquals(testCU.getName(), "Introduction to Analysis");
+        assertEquals(testCU.getCode(), "MATH.MA.110");
+        assertEquals(testCU.getCourseUnitGroupId(), "uta-ykoodi-47926");
+        assertEquals(testCU.getCredits(), 5);
+        assertEquals(testCU.getId(), "otm-94ffcfc5-0db4-4507-b475-63f290639e04");
+    }
+    
+    @Test
+    public void testFromJson() {
+        /*
         BufferedReader testBR = null;
         String jsonString = "";
         try {
@@ -59,14 +72,6 @@ public class CourseUnitReaderTest {
         
         // The files start and finish with a square bracket. Gson didn't like this
         jsonString = jsonString.substring(1, jsonString.length()-1);
-        
-        CourseUnitReader cur = new CourseUnitReader();
-        CourseUnit testCU = cur.fromString(jsonString);
-        
-        assertEquals(testCU.getName(), "Introduction to Analysis");
-        assertEquals(testCU.getCode(), "MATH.MA.110");
-        assertEquals(testCU.getCourseUnitGroupId(), "uta-ykoodi-47926");
-        assertEquals(testCU.getCredits(), 5);
-        assertEquals(testCU.getId(), "otm-94ffcfc5-0db4-4507-b475-63f290639e04");
+        */
     }
 }

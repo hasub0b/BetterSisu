@@ -13,9 +13,15 @@ import java.io.StringReader;
  * @author Leo
  */
 public class CourseUnitReader {
-    public CourseUnit fromString(String s) {
+    /**
+     * Get CourseUnit of groupId from SISU
+     * @param groupId groupId of CourseUnit to get
+     * @return CourseUnit object of groupId
+     */
+    public CourseUnit fromSisu(String groupId) {
         Gson gson = new Gson();
-        JsonReader jreader = new JsonReader(new StringReader(s));
+        String jsonString = UrlJsonFetcher.getCourseUnit(groupId);
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
         jreader.setLenient(true);
         JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
         
@@ -29,10 +35,6 @@ public class CourseUnitReader {
         // code
         JsonElement codeElement = rootElement.get("code");
         String code = codeElement.getAsString();
-        
-        // groupId
-        JsonElement groupIdElement = rootElement.get("groupId");
-        String groupId = groupIdElement.getAsString();
         
         // max credits
         JsonElement creditsElement = rootElement.get("credits");
