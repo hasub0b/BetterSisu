@@ -27,19 +27,24 @@ public class ModuleReader {
         String id = rootElement.get("id").getAsString();
         String type = rootElement.get("type").getAsString();
         
-        // TODO: Add sub-modules and sub-units once they are available!
         if ( type.equals("StudyModule") ) {
             int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
             ArrayList<String> organizers = new ArrayList<>();
             for (var person : rootElement.get("responsibilityInfos").getAsJsonArray()) {
                 organizers.add(person.getAsJsonObject().get("personId").getAsString());
             }
-            return new StudyModule(credits, name, id, groupId, organizers);
+            StudyModule result = new StudyModule(credits, name, id, groupId, organizers);
+            gatherSubs(result);
+            return result;
         } else if (type.equals("DegreeProgramme")) {
             int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
-            return new DegreeProgramme(credits, name, id, groupId);
+            DegreeProgramme result = new DegreeProgramme(credits, name, id, groupId);
+            gatherSubs(result);
+            return result;
         } else {
-            return new GroupingModule(name, id, groupId);
+            GroupingModule result = new GroupingModule(name, id, groupId);
+            gatherSubs(result);
+            return result;
         }
     }
     
@@ -48,8 +53,8 @@ public class ModuleReader {
      * where the keys are "module" and "unit" and payloads are ArrayLists of
      * groupIds of each object type respectively.
      * 
-     * @param groupId
-     * @return 
+     * @param groupId groupId of module to fetch sub-modules/units of
+     * @return Map of types to sub-modules/units
      */
     public TreeMap<String, ArrayList<String>> getSubGroupIds(String groupId) {
         // Step 1: get JSON array of subs
@@ -90,9 +95,9 @@ public class ModuleReader {
                 moduleGroupIds.add(sub.getAsJsonObject().get("moduleGroupId").getAsString());
             }
         }
-        
         result.put("unit", unitGroupIds);
         result.put("module", moduleGroupIds);
+        
         return result;
     }
     
@@ -107,5 +112,21 @@ public class ModuleReader {
         JsonReader jreader = new JsonReader(new StringReader(jsonString));
         jreader.setLenient(true);
         return gson.fromJson(jreader, JsonObject.class);
+    }
+    
+    /**
+     * Gather all rootModule's subs-modules and sub-units into their respective containers
+     * @param rootModule Module to gather subs of.
+     */
+    private void gatherSubs(Module rootModule) {
+        // Fetch study-module's sub-modules
+        for (String subGroupId : getSubGroupIds(rootModule.getGroupId()).get("module")) {
+            rootModule.addSubModule(this.fromSisu(subGroupId));
+        }
+        // Fetch study-module's sub-units
+        for (String subGroupId : getSubGroupIds(rootModule.getGroupId()).get("unit")) {
+            CourseUnitReader cur = new CourseUnitReader();
+            rootModule.addSubUnit(cur.fromSisu(subGroupId));
+        }
     }
 }
