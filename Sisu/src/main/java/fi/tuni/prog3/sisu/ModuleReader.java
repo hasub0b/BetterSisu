@@ -23,7 +23,15 @@ public class ModuleReader {
     public Module fromSisu(String groupId) {
         JsonObject rootElement = gsonFromSisu(groupId);
         
-        String name = rootElement.get("name").getAsJsonObject().get("en").getAsString();
+        JsonObject nameObject = rootElement.get("name").getAsJsonObject();
+        String name;
+        // account for not all courses being in english
+        if ( nameObject.has("en") ) {
+            name = nameObject.get("en").getAsString();
+        } else {
+            name = nameObject.get("fi").getAsString();
+        }
+        
         String id = rootElement.get("id").getAsString();
         String type = rootElement.get("type").getAsString();
         
