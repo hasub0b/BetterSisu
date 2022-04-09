@@ -98,7 +98,7 @@ public class ModuleReader {
     }
     
     /**
-     * Cut through all the layers of rules in the SISU data structure
+     * Cut through layers of rules in the SISU data structure
      * @param givenRule rule to penetrate
      * @return JsonArray of the actual contents of rule
      */

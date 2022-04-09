@@ -131,7 +131,7 @@ public class ModuleReaderTest {
         String groupId = "";
         ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        for ( int i = ids.size() - 20; i < ids.size(); i++ ) {
+        for ( int i = ids.size() - 10; i < ids.size(); i++ ) {
             groupId = ids.get(i);
             testDP = mr.fromSisu(groupId);
             System.err.println(i + "\n");
