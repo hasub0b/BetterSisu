@@ -33,6 +33,10 @@ public class CourseUnit {
 
     public int getCredits() {return credits;}
 
+    @Override
+    public String toString() {
+        return "COURSE: " + getName();
+    }
 }
 
 

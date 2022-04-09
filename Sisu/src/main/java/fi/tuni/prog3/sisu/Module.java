@@ -67,4 +67,25 @@ public abstract class Module {
      * @param sub Sub-unit to add
      */
     public void addSubUnit(CourseUnit sub) {subUnits.add(sub);}
+    
+    public String toString(String indent) {
+        String result = indent + "MODULE: " + getName() + "\n";
+        // Increase indent
+        indent += "   ";
+        
+        if ( !getSubModules().isEmpty() ) {
+            result += indent + "SUB-MODULES " + "(" + getSubModules().size() + "):\n";
+            for ( Module sub : getSubModules() ) {
+                result += sub.toString(indent);
+            }
+        }
+        if ( !getSubUnits().isEmpty() ) {
+            result += indent + "SUB-UNITS " + "(" + getSubUnits().size() + "):\n";
+            for ( CourseUnit sub : getSubUnits() ) {
+                result += indent + "   " + sub.toString() + "\n";
+            }
+        }
+        
+        return result;
+    }
 }
