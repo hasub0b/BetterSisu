@@ -36,10 +36,18 @@ public class CourseUnitReader {
         JsonElement codeElement = rootElement.get("code");
         String code = codeElement.getAsString();
         
-        // max credits
-        JsonElement creditsElement = rootElement.get("credits");
-        JsonElement maxCreditElement = creditsElement.getAsJsonObject().get("max");
-        int credits = maxCreditElement.getAsInt();
+        // max credits. Accounts for funny business with credit amounts.
+        JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
+        JsonElement creditElement = null;
+        int credits = 0;
+        if (creditsObject.has("max")) {
+            JsonElement CreditElement = creditsObject.getAsJsonObject().get("max");
+            credits = CreditElement.getAsInt();
+        } else if (creditsObject.has("min")) {
+            JsonElement CreditElement = creditsObject.getAsJsonObject().get("min");
+            credits = CreditElement.getAsInt();
+        }
+        
         
         // course id
         JsonElement idElement = rootElement.get("id");
