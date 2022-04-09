@@ -111,4 +111,18 @@ public class ModuleReaderTest {
         assertEquals(expectedModules, moduleData);
         assertEquals(expectedGeriatry, geriatryData);
     }
+    
+    @Test
+    public void testGatherSubs() {
+        String geriatryTestId = "otm-7eb812ae-2f0a-4e3a-ac06-bf4695df3fad";
+        ModuleReader mr = new ModuleReader();
+        Module testDP = mr.fromSisu(geriatryTestId);
+        
+        CourseUnit testCU = testDP.getSubModules().get(0).getSubUnits().get(0);
+        String testCUName = testCU.getName();
+        
+        System.err.println(testCUName);
+        
+        assertEquals(testCUName, "Training in Primary Health Care");
+    }
 }
