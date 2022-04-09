@@ -58,26 +58,30 @@ public class ModuleReader {
         JsonObject rule = rootElement.get("rule").getAsJsonObject();
         JsonArray rules = new JsonArray();
         
-        // (Deals with degreeProgramme's 'different' rule structure)
-        if ( moduleType.equals("DegreeProgramme") ) {
-            rules = rule.get("rule")
-                    .getAsJsonObject()
-                    .get("rules")
-                    .getAsJsonArray()
-                    .get(0)
-                    .getAsJsonObject()
-                    .get("rules")
-                    .getAsJsonArray();
-        } else {
-            rules = rule.get("rules").getAsJsonArray();
+        // Step 2: Look for the actual sub-unit/module array...
+        while ( true )  {
+            if ( rule.get("type").getAsString().equals("CompositeRule") ) {
+                String subRulesType = rule.get("rules").getAsJsonArray().get(0).getAsJsonObject().get("type").getAsString();
+                if ( !subRulesType.equals("CourseUnitRule") && !subRulesType.equals("ModuleRule") ) {
+                    rule = rule.get("rules").getAsJsonArray().get(0).getAsJsonObject();
+                } else {
+                    break;
+                }
+            } else if ( rule.get("type").getAsString().equals("CreditsRule") ) {
+                rule = rule.get("rule").getAsJsonObject();
+            } else {
+                break;
+            }
         }
         
-        // Step 2: Initialize containers for result
+        rules = rule.get("rules").getAsJsonArray();
+        
+        // Step 3: Initialize containers for result
         TreeMap<String, ArrayList<String>> result = new TreeMap<>();
         ArrayList<String> unitGroupIds = new ArrayList<>();
         ArrayList<String> moduleGroupIds = new ArrayList<>();
         
-        // Step 3: copy data from rules into containers
+        // Step 4: copy data from rules into containers
         for (var sub : rules) {
             if ( sub.getAsJsonObject().get("type").getAsString().equals("CourseUnitRule") ) {
                 unitGroupIds.add(sub.getAsJsonObject().get("courseUnitGroupId").getAsString());
