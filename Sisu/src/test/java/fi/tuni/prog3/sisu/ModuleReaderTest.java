@@ -82,11 +82,13 @@ public class ModuleReaderTest {
     public void testGetSubModuleNames() {
         String groupId1 = "uta-ok-ykoodi-41176";
         String groupId2 = "uta-tohjelma-1705";
+        String geriatryTestId = "otm-7eb812ae-2f0a-4e3a-ac06-bf4695df3fad";
         
         ModuleReader mr = new ModuleReader();
         
         ArrayList<String> courseUnitData = mr.getSubGroupIds(groupId1).get("unit");
         ArrayList<String> moduleData = mr.getSubGroupIds(groupId2).get("module");
+        ArrayList<String> geriatryData = mr.getSubGroupIds(geriatryTestId).get("module");
         
         ArrayList<String> expectedUnits = new ArrayList<>();
         expectedUnits.add("tut-cu-g-45620");
@@ -102,7 +104,11 @@ public class ModuleReaderTest {
         expectedModules.add("otm-6c36cb36-1507-44ff-baab-a30ac76ca786");
         expectedModules.add("otm-35d5a7e1-71c1-456a-8783-9cf8c34262f5");
         
+        ArrayList<String> expectedGeriatry = new ArrayList<>();
+        expectedGeriatry.add("otm-eaea17e2-13af-4dda-ba94-a6d0ad393a3e");
+        
         assertEquals(expectedUnits, courseUnitData);
         assertEquals(expectedModules, moduleData);
+        assertEquals(expectedGeriatry, geriatryData);
     }
 }
