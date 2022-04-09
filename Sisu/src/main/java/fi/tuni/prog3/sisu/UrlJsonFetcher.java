@@ -17,7 +17,9 @@ public class UrlJsonFetcher {
      * @return JSON format string of all courses in SISU
      */
     public static String getDegreeList() {
-        return getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/module-search?curriculumPeriodId=uta-lvv-2021&universityId=tuni-university-root-id&moduleType=DegreeProgramme&limit=1000");
+        String jsonString = getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/module-search?curriculumPeriodId=uta-lvv-2021&universityId=tuni-university-root-id&moduleType=DegreeProgramme&limit=1000");
+        
+        return jsonString;
     }
     
     /**
@@ -26,7 +28,9 @@ public class UrlJsonFetcher {
      * @return JSON format string of module with groupId from SISU
      */
     public static String getModule(String groupId) {
-        return getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/modules/by-group-id?groupId="+groupId+"&universityId=tuni-university-root-id");
+        String jsonString = getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/modules/by-group-id?groupId="+groupId+"&universityId=tuni-university-root-id");
+        jsonString = jsonString.substring(1,jsonString.length()-1);
+        return jsonString;
     }
     
     /**
@@ -35,7 +39,9 @@ public class UrlJsonFetcher {
      * @return JSON format string of course with groupId from SISU
      */
     public static String getCourseUnit(String groupId) {
-        return getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/course-units/by-group-id?groupId="+groupId+"&universityId=tuni-university-root-id");
+        String jsonString = getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/course-units/by-group-id?groupId="+groupId+"&universityId=tuni-university-root-id");
+        jsonString = jsonString.substring(1,jsonString.length()-1);
+        return jsonString;
     }
     
     /**
