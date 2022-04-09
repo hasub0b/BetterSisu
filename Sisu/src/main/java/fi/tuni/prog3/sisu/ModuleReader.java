@@ -38,9 +38,15 @@ public class ModuleReader {
         if ( type.equals("StudyModule") ) {
             int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
             ArrayList<String> organizers = new ArrayList<>();
-            for (var person : rootElement.get("responsibilityInfos").getAsJsonArray()) {
-                organizers.add(person.getAsJsonObject().get("personId").getAsString());
+            // Fuck it, seems like not all StudyModules even have organizers...
+            if ( !rootElement.get("responsibilityInfos").isJsonNull() ) {
+                for (var person : rootElement.get("responsibilityInfos").getAsJsonArray()) {
+                    if ( !person.getAsJsonObject().get("personId").isJsonNull() ) {
+                        organizers.add(person.getAsJsonObject().get("personId").getAsString());
+                    }
+                }
             }
+            
             StudyModule result = new StudyModule(credits, name, id, groupId, organizers);
             gatherSubs(result);
             return result;
@@ -57,6 +63,25 @@ public class ModuleReader {
     }
     
     /**
+     * Get a list of every available degree's groupIds
+     * @return ArrayList of all degree groupIds
+     */
+    public ArrayList<String> getDegreeGroupIds() {
+        Gson gson = new Gson();
+        String jsonString = UrlJsonFetcher.getDegreeList();
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
+        jreader.setLenient(true);
+        JsonObject rootObject = gson.fromJson(jreader, JsonObject.class);
+        JsonArray degreeArray = rootObject.get("searchResults").getAsJsonArray();
+        
+        ArrayList<String> result = new ArrayList<>();
+        for ( var deg : degreeArray ) {
+            result.add(deg.getAsJsonObject().get("groupId").getAsString());
+        }
+        return result;
+    }
+    
+    /**
      * Gathers all sub-modules and sub-units into a TreeMap 
      * where the keys are "module" and "unit" and payloads are ArrayLists of
      * groupIds of each object type respectively.
@@ -65,47 +90,78 @@ public class ModuleReader {
      * @return Map of types to sub-modules/units
      */
     public TreeMap<String, ArrayList<String>> getSubGroupIds(String groupId) {
-        // Step 1: get JSON array of subs
         JsonObject rootElement = gsonFromSisu(groupId);
         String moduleType = rootElement.get("type").getAsString();
         JsonObject rule = rootElement.get("rule").getAsJsonObject();
+        
+        return extractSubGroupIds(rule);
+    }
+    
+    /**
+     * Cut through all the layers of rules in the SISU data structure
+     * @param givenRule rule to penetrate
+     * @return JsonArray of the actual contents of rule
+     */
+    private JsonArray penetrateRules(JsonObject givenRule) {
+        JsonObject rule = givenRule;
         JsonArray rules = new JsonArray();
         
-        // Step 2: Look for the actual sub-unit/module array...
         while ( true )  {
-            if ( rule.get("type").getAsString().equals("CompositeRule") ) {
-                JsonObject subRules = rule.get("rules").getAsJsonArray().get(0).getAsJsonObject();
-                if ( !subRules.get("type").getAsString().equals("CourseUnitRule") && 
-                        !subRules.get("type").getAsString().equals("ModuleRule") ) {
-                    rule = subRules;
-                } else {
-                    break;
-                }
-            } else if ( rule.get("type").getAsString().equals("CreditsRule") ) {
+            String ruleType = rule.get("type").getAsString();
+            
+            if ( ruleType.equals("CompositeRule") ) {
+                // "If the rule isn't empty"
+                if ( !rule.get("rules").getAsJsonArray().isEmpty() ) {
+                    JsonObject subRules = rule.get("rules").getAsJsonArray().get(0).getAsJsonObject();
+                    // "If subRules isn't an inner array of subs"
+                    if ( !subRules.get("type").getAsString().equals("CourseUnitRule") &&
+                            !subRules.get("type").getAsString().equals("ModuleRule") ) {
+                        rule = subRules;
+                    } else {break;}
+                } else {break;}
+            } else if ( ruleType.equals("CreditsRule") ) {
                 rule = rule.get("rule").getAsJsonObject();
-            } else {
-                break;
-            }
+            } else {break;}
         }
         
         // account for empty modules
         if ( rule.get("rules") != null ) {
             rules = rule.get("rules").getAsJsonArray();
         }
-        
-        // Step 3: Initialize containers for result
+        return rules;
+    }
+    
+    /**
+     * Extract the sub-modules and sub-units from a rule JSON object. 
+     * Works in conjunction with penetrateRules
+     * @param rule JSON format rule to extract data from
+     * @return Map of types to sub-modules/units
+     */
+    private TreeMap<String, ArrayList<String>> extractSubGroupIds(JsonObject rule) {
+        JsonArray rules = penetrateRules(rule);
+ 
         TreeMap<String, ArrayList<String>> result = new TreeMap<>();
         ArrayList<String> unitGroupIds = new ArrayList<>();
         ArrayList<String> moduleGroupIds = new ArrayList<>();
+        result.put("unit", unitGroupIds);
+        result.put("module", moduleGroupIds);
         
-        // Step 4: copy data from rules into containers
         for (var sub : rules) {
-            if ( sub.getAsJsonObject().get("type").getAsString().equals("CourseUnitRule") ) {
+            String subType = sub.getAsJsonObject().get("type").getAsString();
+            
+            if ( subType.equals("CourseUnitRule") ) {
                 unitGroupIds.add(sub.getAsJsonObject().get("courseUnitGroupId").getAsString());
-            } else {
+                
+            } else if (subType.equals("ModuleRule")) {
                 moduleGroupIds.add(sub.getAsJsonObject().get("moduleGroupId").getAsString());
+                
+            } else if ( subType.equals("CreditsRule") || subType.equals("CompositeRule") ) {
+                // if this sub's type is a container, call this method recursively
+                unitGroupIds.addAll(extractSubGroupIds(sub.getAsJsonObject()).get("unit"));
+                moduleGroupIds.addAll(extractSubGroupIds(sub.getAsJsonObject()).get("module"));
             }
         }
+        
         result.put("unit", unitGroupIds);
         result.put("module", moduleGroupIds);
         
