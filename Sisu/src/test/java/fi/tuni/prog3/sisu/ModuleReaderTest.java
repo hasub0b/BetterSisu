@@ -42,7 +42,22 @@ public class ModuleReaderTest {
      * Tests non-recursive parts of fromString. Recursive part in future test!
      */
     @Test
-    public void testFromString() {
+    public void testFromSisu() {
+        ModuleReader mod = new ModuleReader();
+        Module testModule = mod.fromSisu("uta-ok-ykoodi-41176");
+        
+        assertEquals(testModule.getName(), "Basic Studies in Computer Sciences");
+        assertEquals(testModule.getId(), "otm-af70be28-9bf5-49f7-b8fc-41a2bafbf2f2");
+        assertEquals(testModule.getGroupId(), "uta-ok-ykoodi-41176");
+    }
+    
+    /*
+     * To be implemented.
+     */
+    @Test
+    public void testFromJson() {
+        // NOTE: THIS READS INFO FROM A JSON FILE.
+        /*
         BufferedReader testBR = null;
         String jsonString = "";
         try {
@@ -59,16 +74,6 @@ public class ModuleReaderTest {
         } catch (IOException e) {
             fail("File ended unexpectedly");
         }
-        
-        // The files start and finish with a square bracket. Gson didn't like this
-        jsonString = jsonString.substring(1, jsonString.length()-1);
-        
-        ModuleReader mod = new ModuleReader();
-        Module testModule = mod.fromString(jsonString);
-        
-        assertEquals(testModule.getName(), "Basic Studies in Computer Sciences");
-        assertEquals(testModule.getId(), "otm-af70be28-9bf5-49f7-b8fc-41a2bafbf2f2");
-        assertEquals(testModule.getGroupId(), "uta-ok-ykoodi-41176");
+        */
     }
-    
 }

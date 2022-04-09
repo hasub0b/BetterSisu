@@ -13,15 +13,20 @@ import java.util.ArrayList;
  * @author Leo
  */
 public class ModuleReader {
-    public Module fromString(String s) {
+    /**
+     * Get a module from SISU using module groupId
+     * @param s Degree groupId
+     * @return Module of the given groupId
+     */
+    public Module fromSisu(String groupId) {
         Gson gson = new Gson();
-        JsonReader jreader = new JsonReader(new StringReader(s));
+        String jsonString = UrlJsonFetcher.getModule(groupId);
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
         jreader.setLenient(true);
         JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
         
         String name = rootElement.get("name").getAsJsonObject().get("en").getAsString();
         String id = rootElement.get("id").getAsString();
-        String groupId = rootElement.get("groupId").getAsString();
         String type = rootElement.get("type").getAsString();
         
         // TODO: Add sub-modules and sub-units once they are available!
