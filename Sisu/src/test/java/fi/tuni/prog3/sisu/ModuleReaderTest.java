@@ -125,21 +125,40 @@ public class ModuleReaderTest {
     }
 
     @Test
-    public void testCount() {
+    public void testNumberOfSubs() {
         ModuleReader mr = new ModuleReader();
         Module testDP;
         String groupId = "";
         ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        for ( int i = 0; i < ids.size(); i++ ) {
+        for ( int i = 259; i < ids.size(); i++ ) {
             groupId = ids.get(i);
             testDP = mr.fromSisu(groupId);
             System.err.println(i + "\n");
             System.err.println(testDP.toString(""));
-            int expectedSubUnits = UrlJsonFetcher.getModule(groupId).split("CourseUnitRule").length-1;
-            int expectedSubModules = UrlJsonFetcher.getModule(groupId).split("ModuleRule").length-1;
-            assertEquals(testDP.getSubUnits().size(), expectedSubUnits);
-            assertEquals(testDP.getSubModules().size(), expectedSubModules);
+            
+            testModuleSubCount(testDP);
+        }
+    }
+    
+    /**
+     * Test the amount of sub-modules and sub-units that parameter subModule has
+     * @param subModule Module to test subs of
+     */
+    private void testModuleSubCount(Module subModule) {
+        String groupId = subModule.getGroupId();
+        
+        /*
+        Expected amounts are determined by how many times each respective
+        rule type is found in the json.
+        */
+        int expectedSubUnits = UrlJsonFetcher.getModule(groupId).split("\"CourseUnitRule\"").length-1;
+        int expectedSubModules = UrlJsonFetcher.getModule(groupId).split("\"ModuleRule\"").length-1;
+        assertEquals(subModule.getSubUnits().size(), expectedSubUnits);
+        assertEquals(subModule.getSubModules().size(), expectedSubModules);
+            
+        for ( Module sub : subModule.getSubModules() ) {
+            testModuleSubCount(sub);
         }
     }
 }
