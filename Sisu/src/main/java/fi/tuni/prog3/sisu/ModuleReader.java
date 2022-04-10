@@ -109,18 +109,28 @@ public class ModuleReader {
             String ruleType = rule.get("type").getAsString();
             
             if ( ruleType.equals("CompositeRule") ) {
-                // "If the rule isn't empty"
+                // Checks that this CompositeRule isn't empty
                 if ( !rule.get("rules").getAsJsonArray().isEmpty() ) {
-                    JsonObject subRules = rule.get("rules").getAsJsonArray().get(0).getAsJsonObject();
-                    // "If subRules isn't an inner array of subs"
-                    if ( !subRules.get("type").getAsString().equals("CourseUnitRule") &&
-                            !subRules.get("type").getAsString().equals("ModuleRule") ) {
-                        rule = subRules;
-                    } else {break;}
-                } else {break;}
+                    // Get the type of rules this CompositeRule contains
+                    JsonArray rulesArray = rule.get("rules").getAsJsonArray();
+                    JsonObject innerRule = rulesArray.get(0).getAsJsonObject();
+                    String subRulesType  = innerRule.get("type").getAsString();
+                    // If the sub-rule found is an inner composite/credit-rule
+                    if ( subRulesType.equals("CompositeRule") || 
+                            subRulesType.equals("CreditsRule") ) {
+                        // compile all inner-inner rules under one composite
+                        JsonArray subRuleArray = new JsonArray();
+                        for ( var subRule : rulesArray ) {
+                            subRuleArray.addAll(penetrateRules(subRule.getAsJsonObject()));
+                        }
+                        // Replace sub-rules with gathered rules
+                        rule.remove("rules");
+                        rule.add("rules", subRuleArray);    
+                    } else {break;} /*Break if unit or module was found*/
+                } else {break;} /*Break if current rule is empty*/
             } else if ( ruleType.equals("CreditsRule") ) {
                 rule = rule.get("rule").getAsJsonObject();
-            } else {break;}
+            } else {break;} /*Break if current rule isn't composite or credits*/
         }
         
         // account for empty modules
@@ -156,8 +166,9 @@ public class ModuleReader {
                 
             } else if ( subType.equals("CreditsRule") || subType.equals("CompositeRule") ) {
                 // if this sub's type is a container, call this method recursively
-                unitGroupIds.addAll(extractSubGroupIds(sub.getAsJsonObject()).get("unit"));
-                moduleGroupIds.addAll(extractSubGroupIds(sub.getAsJsonObject()).get("module"));
+                TreeMap<String, ArrayList<String>> subs = extractSubGroupIds(sub.getAsJsonObject());
+                unitGroupIds.addAll(subs.get("unit"));
+                moduleGroupIds.addAll(subs.get("module"));
             }
         }
         
