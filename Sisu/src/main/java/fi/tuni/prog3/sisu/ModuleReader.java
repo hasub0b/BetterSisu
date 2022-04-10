@@ -109,7 +109,8 @@ public class ModuleReader {
      * groupIds of each object type respectively.
      * 
      * @param groupId groupId of module to fetch sub-modules/units of
-     * @return Map of types to sub-modules/units
+     * @return Map where keys are "module" and "unit" and payloads are
+     * ArrayLists of groupIds of sub-modules and sub-units respectively
      */
     public TreeMap<String, ArrayList<String>> getSubGroupIds(String groupId) {
         JsonObject rootElement = gsonFromSisu(groupId);
