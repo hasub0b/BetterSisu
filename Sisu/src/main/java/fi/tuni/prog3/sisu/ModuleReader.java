@@ -99,7 +99,7 @@ public class ModuleReader {
     /**
      * Cut through layers of rules in the SISU data structure
      * @param givenRule rule to gather sub-rules of
-     * @return JsonArray of the actual contents of rule
+     * @return JsonArray of ModuleRule and CourseUnitRule JSON objects
      */
     private JsonArray getSubRuleArray(JsonObject givenRule) {
         JsonObject rule = givenRule;
@@ -166,8 +166,6 @@ public class ModuleReader {
         TreeMap<String, ArrayList<String>> result = new TreeMap<>();
         ArrayList<String> unitGroupIds = new ArrayList<>();
         ArrayList<String> moduleGroupIds = new ArrayList<>();
-        result.put("unit", unitGroupIds);
-        result.put("module", moduleGroupIds);
         
         for (var sub : rules) {
             String subType = sub.getAsJsonObject().get("type").getAsString();
@@ -177,18 +175,11 @@ public class ModuleReader {
                 
             } else if (subType.equals("ModuleRule")) {
                 moduleGroupIds.add(sub.getAsJsonObject().get("moduleGroupId").getAsString());
-                
-            } else if ( subType.equals("CreditsRule") || subType.equals("CompositeRule") ) {
-                // if this sub's type is a container, call this method recursively
-                TreeMap<String, ArrayList<String>> subs = extractSubGroupIds(sub.getAsJsonObject());
-                unitGroupIds.addAll(subs.get("unit"));
-                moduleGroupIds.addAll(subs.get("module"));
             }
         }
         
         result.put("unit", unitGroupIds);
         result.put("module", moduleGroupIds);
-        
         return result;
     }
     
