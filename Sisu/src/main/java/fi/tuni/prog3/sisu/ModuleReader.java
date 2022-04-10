@@ -98,39 +98,53 @@ public class ModuleReader {
     
     /**
      * Cut through layers of rules in the SISU data structure
-     * @param givenRule rule to penetrate
+     * @param givenRule rule to gather sub-rules of
      * @return JsonArray of the actual contents of rule
      */
-    private JsonArray penetrateRules(JsonObject givenRule) {
+    private JsonArray getSubRuleArray(JsonObject givenRule) {
         JsonObject rule = givenRule;
         JsonArray rules = new JsonArray();
         
+        // If the given rule is already a module or unit, return it in an array
+        String ruleType = rule.get("type").getAsString();
+        if ( ruleType.equals("CourseUnitRule") || ruleType.equals("ModuleRule") ) {
+            rules.add(rule);
+            return rules;
+        }
+        
+        // Repeating structure to navigate through rules
         while ( true )  {
-            String ruleType = rule.get("type").getAsString();
-            
+            ruleType = rule.get("type").getAsString();
+            // Handle CompositeRule
             if ( ruleType.equals("CompositeRule") ) {
-                // Checks that this CompositeRule isn't empty
-                if ( !rule.get("rules").getAsJsonArray().isEmpty() ) {
-                    // Get the type of rules this CompositeRule contains
-                    JsonArray rulesArray = rule.get("rules").getAsJsonArray();
-                    JsonObject innerRule = rulesArray.get(0).getAsJsonObject();
-                    String subRulesType  = innerRule.get("type").getAsString();
-                    // If the sub-rule found is an inner composite/credit-rule
-                    if ( subRulesType.equals("CompositeRule") || 
-                            subRulesType.equals("CreditsRule") ) {
-                        // compile all inner-inner rules under one composite
-                        JsonArray subRuleArray = new JsonArray();
-                        for ( var subRule : rulesArray ) {
-                            subRuleArray.addAll(penetrateRules(subRule.getAsJsonObject()));
-                        }
-                        // Replace sub-rules with gathered rules
-                        rule.remove("rules");
-                        rule.add("rules", subRuleArray);    
-                    } else {break;} /*Break if unit or module was found*/
-                } else {break;} /*Break if current rule is empty*/
+                JsonArray subRules = rule.get("rules").getAsJsonArray();
+                
+                // If this CompositeRule doesn't have subRules, break
+                if ( subRules.isEmpty() ) {break;}  
+                
+                // Check if this CompositeRule has inner composite/credits-rules
+                Boolean hasDeeperRules = false;
+                for ( var aRule : subRules ) {
+                    String aRuleType = aRule.getAsJsonObject().get("type").getAsString();
+                    if (aRuleType.equals("CompositeRule") || aRuleType.equals("CreditsRule")) {
+                        hasDeeperRules = true;
+                    }
+                }
+                // If this Composite contains only Modules and Units, break
+                if ( !hasDeeperRules ) {break;}
+
+                // compile all deeper rules under one composite
+                JsonArray subRuleArray = new JsonArray();
+                for ( var subRule : subRules ) {
+                    subRuleArray.addAll(getSubRuleArray(subRule.getAsJsonObject()));
+                }
+                // Replace sub-rules with gathered rules
+                rule.remove("rules");
+                rule.add("rules", subRuleArray);
+            // Handle CreditsRule
             } else if ( ruleType.equals("CreditsRule") ) {
                 rule = rule.get("rule").getAsJsonObject();
-            } else {break;} /*Break if current rule isn't composite or credits*/
+            } else {break;} //Break if current rule isn't composite or credits
         }
         
         // account for empty modules
@@ -142,12 +156,12 @@ public class ModuleReader {
     
     /**
      * Extract the sub-modules and sub-units from a rule JSON object. 
-     * Works in conjunction with penetrateRules
+     * Works in conjunction with getSubRuleArray
      * @param rule JSON format rule to extract data from
      * @return Map of types to sub-modules/units
      */
     private TreeMap<String, ArrayList<String>> extractSubGroupIds(JsonObject rule) {
-        JsonArray rules = penetrateRules(rule);
+        JsonArray rules = getSubRuleArray(rule);
  
         TreeMap<String, ArrayList<String>> result = new TreeMap<>();
         ArrayList<String> unitGroupIds = new ArrayList<>();
