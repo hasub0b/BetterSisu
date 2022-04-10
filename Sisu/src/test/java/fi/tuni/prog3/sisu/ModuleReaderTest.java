@@ -125,17 +125,21 @@ public class ModuleReaderTest {
     }
 
     @Test
-    public void testView() {
+    public void testCount() {
         ModuleReader mr = new ModuleReader();
         Module testDP;
         String groupId = "";
         ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        for ( int i = ids.size() - 10; i < ids.size(); i++ ) {
+        for ( int i = 0; i < ids.size(); i++ ) {
             groupId = ids.get(i);
             testDP = mr.fromSisu(groupId);
             System.err.println(i + "\n");
             System.err.println(testDP.toString(""));
+            int expectedSubUnits = UrlJsonFetcher.getModule(groupId).split("CourseUnitRule").length-1;
+            int expectedSubModules = UrlJsonFetcher.getModule(groupId).split("ModuleRule").length-1;
+            assertEquals(testDP.getSubUnits().size(), expectedSubUnits);
+            assertEquals(testDP.getSubModules().size(), expectedSubModules);
         }
     }
 }
