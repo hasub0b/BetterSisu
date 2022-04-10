@@ -38,7 +38,6 @@ public class ModuleReader {
         if ( type.equals("StudyModule") ) {
             int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
             ArrayList<String> organizers = new ArrayList<>();
-            // Fuck it, seems like not all StudyModules even have organizers...
             if ( !rootElement.get("responsibilityInfos").isJsonNull() ) {
                 for (var person : rootElement.get("responsibilityInfos").getAsJsonArray()) {
                     if ( !person.getAsJsonObject().get("personId").isJsonNull() ) {
