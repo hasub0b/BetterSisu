@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.TreeMap;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -131,13 +132,25 @@ public class ModuleReaderTest {
         String groupId = "";
         ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        for ( int i = 259; i < ids.size(); i++ ) {
+        for ( int i = 269; i < ids.size(); i++ ) {
             groupId = ids.get(i);
             testDP = mr.fromSisu(groupId);
+            // Test prints
+            /*
             System.err.println(i + "\n");
             System.err.println(testDP.toString(""));
-            
+            */
             testModuleSubCount(testDP);
+        }
+    }
+    
+    @Test
+    public void testPrintDegreesToGroupIds() {
+        ModuleReader mr = new ModuleReader();
+        TreeMap<String, String> degrees = mr.getDegreeGroupIdPairs();
+        
+        for ( String key : degrees.keySet() ) {
+            System.err.println(String.format("%-101s %s", key, degrees.get(key)));
         }
     }
     
