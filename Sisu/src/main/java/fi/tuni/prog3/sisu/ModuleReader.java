@@ -62,6 +62,29 @@ public class ModuleReader {
     }
     
     /**
+     * Get a TreeMap of degree names to groupIds
+     * @return TreeMap where keys are degree names and payloads are groupIds
+     */
+    public TreeMap<String, String> getDegreeGroupIdPairs() {
+        TreeMap<String, String> result = new TreeMap<>();
+        String name;
+        
+        for ( String groupId : getDegreeGroupIds() ) {
+            JsonObject degreeObject = gsonFromSisu(groupId).get("name").getAsJsonObject();
+            
+            if ( degreeObject.has("en") ) {
+                name = degreeObject.get("en").getAsString();
+            } else {
+                name = degreeObject.get("fi").getAsString();
+            }
+            
+            result.put(name, groupId);
+        }
+        
+        return result;
+    }
+    
+    /**
      * Get a list of every available degree's groupIds
      * @return ArrayList of all degree groupIds
      */
@@ -81,7 +104,7 @@ public class ModuleReader {
     }
     
     /**
-     * Gathers all sub-modules and sub-units into a TreeMap 
+     * Gathers all sub-module and sub-unit groupIds into a TreeMap 
      * where the keys are "module" and "unit" and payloads are ArrayLists of
      * groupIds of each object type respectively.
      * 
@@ -157,7 +180,8 @@ public class ModuleReader {
      * Extract the sub-modules and sub-units from a rule JSON object. 
      * Works in conjunction with getSubRuleArray
      * @param rule JSON format rule to extract data from
-     * @return Map of types to sub-modules/units
+     * @return Map where keys are "module" and "unit" and payloads are arrays of
+     * sub-module/sub-unit groupIds respectively
      */
     private TreeMap<String, ArrayList<String>> extractSubGroupIds(JsonObject rule) {
         JsonArray rules = getSubRuleArray(rule);
