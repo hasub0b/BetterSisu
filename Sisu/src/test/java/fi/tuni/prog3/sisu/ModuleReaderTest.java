@@ -132,7 +132,7 @@ public class ModuleReaderTest {
         String groupId = "";
         ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        for ( int i = 269; i < ids.size(); i++ ) {
+        for ( int i = 0; i < ids.size(); i++ ) {
             groupId = ids.get(i);
             testDP = mr.fromSisu(groupId);
             // Test prints
@@ -149,9 +149,12 @@ public class ModuleReaderTest {
         ModuleReader mr = new ModuleReader();
         TreeMap<String, String> degrees = mr.getDegreeGroupIdPairs();
         
+        // Test prints
+        /*
         for ( String key : degrees.keySet() ) {
             System.err.println(String.format("%-101s %s", key, degrees.get(key)));
         }
+        */
     }
     
     /**
