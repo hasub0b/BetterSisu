@@ -48,17 +48,22 @@ public class CourseUnitReader {
         // max credits. Accounts for funny business with credit amounts.
         JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
         JsonElement creditElement = null;
-        int credits = 0;
+        int maxCredits = 0;
+        int minCredits = 0;
         if (creditsObject.has("max")) {
             creditElement = creditsObject.getAsJsonObject().get("max");
             if ( !creditElement.isJsonNull() ) {
-                credits = creditElement.getAsInt();
+                maxCredits = creditElement.getAsInt();
             }
-        } else if (creditsObject.has("min")) {
+        }   
+        if (creditsObject.has("min")) {
             creditElement = creditsObject.getAsJsonObject().get("min");
             if ( !creditElement.isJsonNull() ) {
-                credits = creditElement.getAsInt();
+                minCredits = creditElement.getAsInt();
             }
+        } else {
+            // if a minimum credits limit hasn't been defined, use max
+            minCredits = maxCredits;
         }
         
         // course id
@@ -66,9 +71,9 @@ public class CourseUnitReader {
         String id = idElement.getAsString();
         
         if ( !en_name.equals("Name unavailable") ) {
-            return new CourseUnit(id,groupId,en_name,code,credits);
+            return new CourseUnit(id,groupId,en_name,code,minCredits,maxCredits);
         } else {
-            return new CourseUnit(id,groupId,fi_name,code,credits);
+            return new CourseUnit(id,groupId,fi_name,code,minCredits,maxCredits);
         }
     }
 }
