@@ -70,11 +70,14 @@ public class CourseUnitTest {
         String outcome = "Student knows airspeed velocity of unladen swallow";
         String material = "Book.";
 
+        assertTrue(courseUnit.hasContent());
+        
         courseUnit.addContent(content);
         courseUnit.addPrerequisite(prerequisite);
         courseUnit.addOutcome(outcome);
         courseUnit.addMaterial(material);
         
+        assertTrue(!courseUnit.hasContent());
         assertEquals(courseUnit.getContent(), content);
         assertEquals(courseUnit.getPrerequisite(), prerequisite);
         assertEquals(courseUnit.getOutcome(), outcome);
