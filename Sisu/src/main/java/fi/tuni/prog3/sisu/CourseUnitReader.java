@@ -45,7 +45,7 @@ public class CourseUnitReader {
             code = codeElement.getAsString();
         }
         
-        // max credits. Accounts for funny business with credit amounts.
+        // credits
         JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
         JsonElement creditElement = null;
         int maxCredits = 0;
@@ -64,6 +64,11 @@ public class CourseUnitReader {
         } else {
             // if a minimum credits limit hasn't been defined, use max
             minCredits = maxCredits;
+        }
+        
+        // if min credits was defined and max wasn't, use min as max
+        if ( minCredits > maxCredits) {
+            maxCredits = minCredits;
         }
         
         // course id
