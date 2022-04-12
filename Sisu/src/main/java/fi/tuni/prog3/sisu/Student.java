@@ -7,7 +7,7 @@ import java.util.ArrayList;
  *
  * @author Jyri
  */
-public class Student {
+public class Student implements Comparable<Student> {
 
     private final String firstName;
     private final String lastName;
@@ -44,5 +44,18 @@ public class Student {
     @Override
     public String toString() {
         return String.format("%s, %s (%s)", lastName, firstName, studentId);
+    }
+
+    @Override
+    public int compareTo(Student o) {
+        int result = lastName.compareToIgnoreCase(o.getLastName());
+        if (result == 0) {
+            result = firstName.compareToIgnoreCase(o.getFirstName());
+            if (result == 0) {
+                result = studentId.compareToIgnoreCase(o.getStudentId());
+            }
+        }
+
+        return result;
     }
 }
