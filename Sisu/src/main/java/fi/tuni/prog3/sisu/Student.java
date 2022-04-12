@@ -41,4 +41,8 @@ public class Student {
         return programmes;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s, %s (%s)", lastName, firstName, studentId);
+    }
 }
