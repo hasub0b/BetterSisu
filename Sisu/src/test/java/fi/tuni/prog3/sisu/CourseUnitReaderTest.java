@@ -46,32 +46,18 @@ public class CourseUnitReaderTest {
         assertEquals(testCU.getName(), "Introduction to Analysis");
         assertEquals(testCU.getCode(), "MATH.MA.110");
         assertEquals(testCU.getCourseUnitGroupId(), "uta-ykoodi-47926");
-        assertEquals(testCU.getCredits(), 5);
+        assertEquals(testCU.getMaxCredits(), 5);
         assertEquals(testCU.getId(), "otm-94ffcfc5-0db4-4507-b475-63f290639e04");
     }
     
     @Test
-    public void testFromJson() {
-        /*
-        BufferedReader testBR = null;
-        String jsonString = "";
-        try {
-            testBR = new BufferedReader(new FileReader("src/test/resources/courseUnitExample.json"));
-        } catch (FileNotFoundException e) {
-            fail("Test file not found (Course unit)");
-        }
-        try {
-            String line = testBR.readLine();
-            while (line != null) {
-                jsonString += line;
-                line = testBR.readLine();
-            }
-        } catch (IOException e) {
-            fail("File ended unexpectedly");
-        }
+    public void testAdditionalInfo() {
+        CourseUnitReader cur = new CourseUnitReader();
+        CourseUnit testCU = cur.fromSisu("uta-ykoodi-47926");
         
-        // The files start and finish with a square bracket. Gson didn't like this
-        jsonString = jsonString.substring(1, jsonString.length()-1);
-        */
+        assertTrue(testCU.getOutcome().endsWith(" muuttujan funktioita."));
+        assertTrue(testCU.getPrerequisite().endsWith(" kurssit<br /></p>"));
+        assertTrue(testCU.getContent().endsWith(" integrointi <br /></p>"));
+        assertTrue(testCU.getMaterial().endsWith(" jaettava materiaali.</p>"));
     }
 }
