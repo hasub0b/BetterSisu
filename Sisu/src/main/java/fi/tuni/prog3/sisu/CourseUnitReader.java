@@ -13,36 +13,62 @@ import java.io.StringReader;
  * @author Leo
  */
 public class CourseUnitReader {
-    public CourseUnit fromString(String s) {
+    /**
+     * Get CourseUnit of groupId from SISU
+     * @param groupId groupId of CourseUnit to get
+     * @return CourseUnit object of groupId
+     */
+    public CourseUnit fromSisu(String groupId) {
         Gson gson = new Gson();
-        JsonReader jreader = new JsonReader(new StringReader(s));
+        String jsonString = UrlJsonFetcher.getCourseUnit(groupId);
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
         jreader.setLenient(true);
         JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
         
         // names
+        String fi_name = "Nimi ei ole saatavilla.";
+        String en_name = "Name unavailable";
         JsonElement namesElement = rootElement.get("name");
         JsonElement en_name_element = namesElement.getAsJsonObject().get("en");
-        String en_name = en_name_element.getAsString();
+        if ( en_name_element != null ) {
+            en_name = en_name_element.getAsString();
+        }
         JsonElement fi_name_element = namesElement.getAsJsonObject().get("fi");
-        String fi_name = fi_name_element.getAsString();
+        if ( fi_name_element != null ) {
+            fi_name = fi_name_element.getAsString();
+        }
         
         // code
+        String code = "code unavailable";
         JsonElement codeElement = rootElement.get("code");
-        String code = codeElement.getAsString();
+        if ( !codeElement.isJsonNull() ) {
+            code = codeElement.getAsString();
+        }
         
-        // groupId
-        JsonElement groupIdElement = rootElement.get("groupId");
-        String groupId = groupIdElement.getAsString();
-        
-        // max credits
-        JsonElement creditsElement = rootElement.get("credits");
-        JsonElement maxCreditElement = creditsElement.getAsJsonObject().get("max");
-        int credits = maxCreditElement.getAsInt();
+        // max credits. Accounts for funny business with credit amounts.
+        JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
+        JsonElement creditElement = null;
+        int credits = 0;
+        if (creditsObject.has("max")) {
+            creditElement = creditsObject.getAsJsonObject().get("max");
+            if ( !creditElement.isJsonNull() ) {
+                credits = creditElement.getAsInt();
+            }
+        } else if (creditsObject.has("min")) {
+            creditElement = creditsObject.getAsJsonObject().get("min");
+            if ( !creditElement.isJsonNull() ) {
+                credits = creditElement.getAsInt();
+            }
+        }
         
         // course id
         JsonElement idElement = rootElement.get("id");
         String id = idElement.getAsString();
         
-        return new CourseUnit(id,groupId,en_name,code,credits);
+        if ( !en_name.equals("Name unavailable") ) {
+            return new CourseUnit(id,groupId,en_name,code,credits);
+        } else {
+            return new CourseUnit(id,groupId,fi_name,code,credits);
+        }
     }
 }
