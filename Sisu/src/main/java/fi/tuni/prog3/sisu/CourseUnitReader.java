@@ -26,16 +26,16 @@ public class CourseUnitReader {
         JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
         
         // names
-        String fi_name = "Nimi ei ole saatavilla.";
-        String en_name = "Name unavailable";
+        String fiName = "Nimi ei ole saatavilla.";
+        String enName = "Name unavailable";
         JsonElement namesElement = rootElement.get("name");
-        JsonElement en_name_element = namesElement.getAsJsonObject().get("en");
-        if ( en_name_element != null ) {
-            en_name = en_name_element.getAsString();
+        JsonElement enNameElement = namesElement.getAsJsonObject().get("en");
+        if ( enNameElement != null ) {
+            enName = enNameElement.getAsString();
         }
-        JsonElement fi_name_element = namesElement.getAsJsonObject().get("fi");
-        if ( fi_name_element != null ) {
-            fi_name = fi_name_element.getAsString();
+        JsonElement fiNameElement = namesElement.getAsJsonObject().get("fi");
+        if ( fiNameElement != null ) {
+            fiName = fiNameElement.getAsString();
         }
         
         // code
@@ -75,10 +75,13 @@ public class CourseUnitReader {
         JsonElement idElement = rootElement.get("id");
         String id = idElement.getAsString();
         
-        if ( !en_name.equals("Name unavailable") ) {
-            return new CourseUnit(id,groupId,en_name,code,minCredits,maxCredits);
+        // addtl info
+        
+        
+        if ( !enName.equals("Name unavailable") ) {
+            return new CourseUnit(id,groupId,enName,code,minCredits,maxCredits);
         } else {
-            return new CourseUnit(id,groupId,fi_name,code,minCredits,maxCredits);
+            return new CourseUnit(id,groupId,fiName,code,minCredits,maxCredits);
         }
     }
 }
