@@ -56,10 +56,10 @@ public class CourseUnit {
     public void setPrerequisite(String prereq) {this.prerequisite = prereq;}
     public void setOutcome(String outcome) {this.outcome = outcome;}
     public void setMaterial(String material) {this.material = material;}
-    public Boolean hasContent() {return content == null;}
-    public Boolean hasPrerequisite() {return prerequisite == null;}
-    public Boolean hasOutcome() {return outcome == null;}
-    public Boolean hasMaterial() {return material == null;}
+    public Boolean hasContent() {return (content == null);}
+    public Boolean hasPrerequisite() {return (prerequisite == null);}
+    public Boolean hasOutcome() {return (outcome == null);}
+    public Boolean hasMaterial() {return (material == null);}
     
     @Override
     public String toString() {
