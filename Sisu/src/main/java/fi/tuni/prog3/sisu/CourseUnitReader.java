@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import java.io.StringReader;
+import java.util.TreeMap;
 
 /**
  * Turn CourseUnit JSON-format string into CourseUnit object
@@ -26,17 +27,7 @@ public class CourseUnitReader {
         JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
         
         // names
-        String fiName = "Nimi ei ole saatavilla.";
-        String enName = "Name unavailable";
-        JsonElement namesElement = rootElement.get("name");
-        JsonElement enNameElement = namesElement.getAsJsonObject().get("en");
-        if ( enNameElement != null ) {
-            enName = enNameElement.getAsString();
-        }
-        JsonElement fiNameElement = namesElement.getAsJsonObject().get("fi");
-        if ( fiNameElement != null ) {
-            fiName = fiNameElement.getAsString();
-        }
+        String enName = getEnAttribute(rootElement, "name");
         
         // code
         String code = "code unavailable";
@@ -46,6 +37,51 @@ public class CourseUnitReader {
         }
         
         // credits
+        int minCredits = getMinMaxCredits(rootElement).get("min");
+        int maxCredits = getMinMaxCredits(rootElement).get("max");
+        
+        // course id
+        JsonElement idElement = rootElement.get("id");
+        String id = idElement.getAsString();
+        
+        // initialize result
+        CourseUnit result = new CourseUnit(id,groupId,enName,code,minCredits,maxCredits);
+
+        // addtl info
+        result.setContent(getEnAttribute(rootElement, "content"));
+        result.setPrerequisite(getEnAttribute(rootElement, "prerequisites"));
+        result.setOutcome(getEnAttribute(rootElement, "outcomes"));
+        result.setMaterial(getEnAttribute(rootElement, "learningMaterial"));
+        
+        return result;
+    }
+    
+    /**
+     * Get an English attribute from JsonObject.
+     * If English attribute is unavailable, return Finnish attribute.
+     * If no attribute is available, return null.
+     * @param rootElement Object to get element from
+     * @param attName Attribute name
+     * @return Attribute value if it exists, else null
+     */
+    private String getEnAttribute(JsonObject rootElement, String attName) {
+        String result = null;
+        
+        if ( rootElement.has(attName) ) {
+            if (!rootElement.get(attName).isJsonNull()) {
+                JsonObject contentLangObj = rootElement.get(attName).getAsJsonObject();
+                if ( contentLangObj.has("en") ) {
+                    result = contentLangObj.get("en").getAsString();
+                } else {
+                    result = contentLangObj.get("fi").getAsString();
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private TreeMap<String, Integer> getMinMaxCredits(JsonObject rootElement) {
         JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
         JsonElement creditElement = null;
         int maxCredits = 0;
@@ -65,23 +101,15 @@ public class CourseUnitReader {
             // if a minimum credits limit hasn't been defined, use max
             minCredits = maxCredits;
         }
-        
         // if min credits was defined and max wasn't, use min as max
         if ( minCredits > maxCredits) {
             maxCredits = minCredits;
         }
         
-        // course id
-        JsonElement idElement = rootElement.get("id");
-        String id = idElement.getAsString();
+        TreeMap<String, Integer> result = new TreeMap<>();
+        result.put("min", minCredits);
+        result.put("max", maxCredits);
         
-        // addtl info
-        
-        
-        if ( !enName.equals("Name unavailable") ) {
-            return new CourseUnit(id,groupId,enName,code,minCredits,maxCredits);
-        } else {
-            return new CourseUnit(id,groupId,fiName,code,minCredits,maxCredits);
-        }
+        return result;
     }
 }
