@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import java.io.StringReader;
+import java.util.TreeMap;
 
 /**
  * Turn CourseUnit JSON-format string into CourseUnit object
@@ -26,17 +27,7 @@ public class CourseUnitReader {
         JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
         
         // names
-        String fi_name = "Nimi ei ole saatavilla.";
-        String en_name = "Name unavailable";
-        JsonElement namesElement = rootElement.get("name");
-        JsonElement en_name_element = namesElement.getAsJsonObject().get("en");
-        if ( en_name_element != null ) {
-            en_name = en_name_element.getAsString();
-        }
-        JsonElement fi_name_element = namesElement.getAsJsonObject().get("fi");
-        if ( fi_name_element != null ) {
-            fi_name = fi_name_element.getAsString();
-        }
+        String enName = getEnAttribute(rootElement, "name");
         
         // code
         String code = "code unavailable";
@@ -45,30 +36,80 @@ public class CourseUnitReader {
             code = codeElement.getAsString();
         }
         
-        // max credits. Accounts for funny business with credit amounts.
-        JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
-        JsonElement creditElement = null;
-        int credits = 0;
-        if (creditsObject.has("max")) {
-            creditElement = creditsObject.getAsJsonObject().get("max");
-            if ( !creditElement.isJsonNull() ) {
-                credits = creditElement.getAsInt();
-            }
-        } else if (creditsObject.has("min")) {
-            creditElement = creditsObject.getAsJsonObject().get("min");
-            if ( !creditElement.isJsonNull() ) {
-                credits = creditElement.getAsInt();
-            }
-        }
+        // credits
+        int minCredits = getMinMaxCredits(rootElement).get("min");
+        int maxCredits = getMinMaxCredits(rootElement).get("max");
         
         // course id
         JsonElement idElement = rootElement.get("id");
         String id = idElement.getAsString();
         
-        if ( !en_name.equals("Name unavailable") ) {
-            return new CourseUnit(id,groupId,en_name,code,credits);
-        } else {
-            return new CourseUnit(id,groupId,fi_name,code,credits);
+        // initialize result
+        CourseUnit result = new CourseUnit(id,groupId,enName,code,minCredits,maxCredits);
+
+        // addtl info
+        result.setContent(getEnAttribute(rootElement, "content"));
+        result.setPrerequisite(getEnAttribute(rootElement, "prerequisites"));
+        result.setOutcome(getEnAttribute(rootElement, "outcomes"));
+        result.setMaterial(getEnAttribute(rootElement, "learningMaterial"));
+        
+        return result;
+    }
+    
+    /**
+     * Get an English attribute from JsonObject.
+     * If English attribute is unavailable, return Finnish attribute.
+     * If no attribute is available, return null.
+     * @param rootElement Object to get element from
+     * @param attName Attribute name
+     * @return Attribute value if it exists, else null
+     */
+    private String getEnAttribute(JsonObject rootElement, String attName) {
+        String result = null;
+        
+        if ( rootElement.has(attName) ) {
+            if (!rootElement.get(attName).isJsonNull()) {
+                JsonObject contentLangObj = rootElement.get(attName).getAsJsonObject();
+                if ( contentLangObj.has("en") ) {
+                    result = contentLangObj.get("en").getAsString();
+                } else {
+                    result = contentLangObj.get("fi").getAsString();
+                }
+            }
         }
+        
+        return result;
+    }
+    
+    private TreeMap<String, Integer> getMinMaxCredits(JsonObject rootElement) {
+        JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
+        JsonElement creditElement = null;
+        int maxCredits = 0;
+        int minCredits = 0;
+        if (creditsObject.has("max")) {
+            creditElement = creditsObject.getAsJsonObject().get("max");
+            if ( !creditElement.isJsonNull() ) {
+                maxCredits = creditElement.getAsInt();
+            }
+        }   
+        if (creditsObject.has("min")) {
+            creditElement = creditsObject.getAsJsonObject().get("min");
+            if ( !creditElement.isJsonNull() ) {
+                minCredits = creditElement.getAsInt();
+            }
+        } else {
+            // if a minimum credits limit hasn't been defined, use max
+            minCredits = maxCredits;
+        }
+        // if min credits was defined and max wasn't, use min as max
+        if ( minCredits > maxCredits) {
+            maxCredits = minCredits;
+        }
+        
+        TreeMap<String, Integer> result = new TreeMap<>();
+        result.put("min", minCredits);
+        result.put("max", maxCredits);
+        
+        return result;
     }
 }
