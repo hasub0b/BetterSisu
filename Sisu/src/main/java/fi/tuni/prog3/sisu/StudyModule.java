@@ -38,4 +38,34 @@ public class StudyModule extends DegreeProgramme {
     public ArrayList<String> getOrganizers() {
         return organizers;
     }
+    
+    @Override
+    public String toString(String indent) {
+        String result = String.format("%sMODULE: %s Organizers (%d)", 
+                indent, getName(), getOrganizers().size());
+        
+        if ( getOrganizers().size() != 0 ) {
+            result += String.format(": %s et al.\n", getOrganizers().get(0));
+        } else {
+            result += "\n";
+        }
+        
+        // Increase indent
+        indent += "   ";
+        
+        if ( !getSubModules().isEmpty() ) {
+            result += indent + "SUB-MODULES " + "(" + getSubModules().size() + "):\n";
+            for ( Module sub : getSubModules() ) {
+                result += sub.toString(indent);
+            }
+        }
+        if ( !getSubUnits().isEmpty() ) {
+            result += indent + "SUB-UNITS " + "(" + getSubUnits().size() + "):\n";
+            for ( CourseUnit sub : getSubUnits() ) {
+                result += indent + "   " + sub.toString() + "\n";
+            }
+        }
+        
+        return result;
+    }
 }
