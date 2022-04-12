@@ -72,10 +72,10 @@ public class CourseUnitTest {
 
         assertTrue(courseUnit.hasContent());
         
-        courseUnit.addContent(content);
-        courseUnit.addPrerequisite(prerequisite);
-        courseUnit.addOutcome(outcome);
-        courseUnit.addMaterial(material);
+        courseUnit.setContent(content);
+        courseUnit.setPrerequisite(prerequisite);
+        courseUnit.setOutcome(outcome);
+        courseUnit.setMaterial(material);
         
         assertTrue(!courseUnit.hasContent());
         assertEquals(courseUnit.getContent(), content);
