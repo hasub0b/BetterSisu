@@ -1,16 +1,20 @@
+
 package fi.tuni.prog3.sisu;
 
-import org.junit.jupiter.api.*;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
 /**
- *
  * Test for CourseUnit
  *
  * @author hasu
  */
 
-class CourseUnitTest {
+public class CourseUnitTest {
 
     public CourseUnitTest() {
     }
