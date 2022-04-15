@@ -168,8 +168,9 @@ public class ModuleReaderTest {
         Expected amounts are determined by how many times each respective
         rule type is found in the json.
         */
-        int expectedSubUnits = UrlJsonFetcher.getModule(groupId).split("\"CourseUnitRule\"").length-1;
-        int expectedSubModules = UrlJsonFetcher.getModule(groupId).split("\"ModuleRule\"").length-1;
+        JsonStringFetcher jsf = new UrlJsonFetcher();
+        int expectedSubUnits = jsf.getModule(groupId).split("\"CourseUnitRule\"").length-1;
+        int expectedSubModules = jsf.getModule(groupId).split("\"ModuleRule\"").length-1;
         assertEquals(subModule.getSubUnits().size(), expectedSubUnits);
         assertEquals(subModule.getSubModules().size(), expectedSubModules);
             
