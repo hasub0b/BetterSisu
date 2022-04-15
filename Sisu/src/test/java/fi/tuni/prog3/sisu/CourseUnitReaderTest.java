@@ -40,7 +40,7 @@ public class CourseUnitReaderTest {
 
     @Test
     public void testFromSisu() {
-        CourseUnitReader cur = new CourseUnitReader();
+        CourseUnitReader cur = new CourseUnitReader(new UrlJsonFetcher());
         CourseUnit testCU = cur.fromSisu("uta-ykoodi-47926");
         
         assertEquals(testCU.getName(), "Introduction to Analysis");
@@ -52,7 +52,7 @@ public class CourseUnitReaderTest {
     
     @Test
     public void testAdditionalInfo() {
-        CourseUnitReader cur = new CourseUnitReader();
+        CourseUnitReader cur = new CourseUnitReader(new UrlJsonFetcher());
         CourseUnit testCU = cur.fromSisu("uta-ykoodi-47926");
         
         assertTrue(testCU.getOutcome().endsWith(" muuttujan funktioita."));
