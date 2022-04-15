@@ -58,13 +58,15 @@ public class UrlJsonFetcherTest {
     
     @Test
     public void testGetModule() {
-        String testModule = UrlJsonFetcher.getModule("uta-ok-ykoodi-41176");
+        UrlJsonFetcher ujf = new UrlJsonFetcher();
+        String testModule = ujf.getModule("uta-ok-ykoodi-41176");
         assertTrue(testModule.endsWith("\"description\":null,\"allMandatory\":true}}"));
     }
     
     @Test
     public void testGetCourseUnit() {
-        String testCourseUnit = UrlJsonFetcher.getCourseUnit("uta-ykoodi-47926");
+        UrlJsonFetcher ujf = new UrlJsonFetcher();
+        String testCourseUnit = ujf.getCourseUnit("uta-ykoodi-47926");
         assertTrue(testCourseUnit.endsWith("\"inclusionApplicationInstruction\":null}"));
     }
 }

@@ -44,9 +44,9 @@ public class ModuleReaderTest {
      * Tests non-recursive parts of fromString. Recursive part in future test!
      */
     @Test
-    public void testFromSisu() {
+    public void testBuildModule() {
         ModuleReader mod = new ModuleReader(new UrlJsonFetcher());
-        Module testModule = mod.fromSisu("uta-ok-ykoodi-41176");
+        Module testModule = mod.buildModule("uta-ok-ykoodi-41176");
         
         assertEquals(testModule.getName(), "Basic Studies in Computer Sciences");
         assertEquals(testModule.getId(), "otm-af70be28-9bf5-49f7-b8fc-41a2bafbf2f2");
@@ -117,7 +117,7 @@ public class ModuleReaderTest {
     public void testGatherSubs() {
         String geriatryTestId = "otm-7eb812ae-2f0a-4e3a-ac06-bf4695df3fad";
         ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
-        Module testDP = mr.fromSisu(geriatryTestId);
+        Module testDP = mr.buildModule(geriatryTestId);
         
         CourseUnit testCU = testDP.getSubModules().get(0).getSubUnits().get(0);
         String testCUName = testCU.getName();
@@ -134,7 +134,7 @@ public class ModuleReaderTest {
         
         for ( int i =259; i < ids.size(); i++ ) {
             groupId = ids.get(i);
-            testDP = mr.fromSisu(groupId);
+            testDP = mr.buildModule(groupId);
             // Test prints
             
             System.err.println(i + "\n");
