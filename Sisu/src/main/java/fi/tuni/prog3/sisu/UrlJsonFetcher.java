@@ -11,7 +11,7 @@ import java.net.URL;
  *
  * @author Leo
  */
-public class UrlJsonFetcher {
+public class UrlJsonFetcher implements JsonStringFetcher {
     /**
      * Get a list of all degrees from SISU
      * @return JSON format string of all courses in SISU
@@ -27,7 +27,7 @@ public class UrlJsonFetcher {
      * @param groupId groupId of the module
      * @return JSON format string of module with groupId from SISU
      */
-    public static String getModule(String groupId) {
+    public String getModule(String groupId) {
         String jsonString = getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/modules/by-group-id?groupId="+groupId+"&universityId=tuni-university-root-id");
         jsonString = jsonString.substring(1,jsonString.length()-1);
         return jsonString;
@@ -38,7 +38,7 @@ public class UrlJsonFetcher {
      * @param groupId groupId of the course
      * @return JSON format string of course with groupId from SISU
      */
-    public static String getCourseUnit(String groupId) {
+    public String getCourseUnit(String groupId) {
         String jsonString = getStringFromUrl("https://sis-tuni.funidata.fi/kori/api/course-units/by-group-id?groupId="+groupId+"&universityId=tuni-university-root-id");
         jsonString = jsonString.substring(1,jsonString.length()-1);
         return jsonString;
