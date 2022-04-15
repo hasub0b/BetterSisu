@@ -15,6 +15,13 @@ import java.util.TreeMap;
  * @author Leo
  */
 public class ModuleReader {
+    
+    private JsonStringFetcher jsonSource;
+    
+    public ModuleReader(JsonStringFetcher jsonSource) {
+        this.jsonSource = jsonSource;
+    }
+    
     /**
      * Get a module from SISU using module groupId
      * @param groupId Degree groupId
@@ -214,7 +221,7 @@ public class ModuleReader {
      */
     private JsonObject gsonFromSisu(String groupId) {
         Gson gson = new Gson();
-        String jsonString = UrlJsonFetcher.getModule(groupId);
+        String jsonString = jsonSource.getModule(groupId);
         JsonReader jreader = new JsonReader(new StringReader(jsonString));
         jreader.setLenient(true);
         return gson.fromJson(jreader, JsonObject.class);
@@ -231,7 +238,7 @@ public class ModuleReader {
         }
         // Fetch study-module's sub-units
         for (String subGroupId : getSubGroupIds(rootModule.getGroupId()).get("unit")) {
-            CourseUnitReader cur = new CourseUnitReader();
+            CourseUnitReader cur = new CourseUnitReader(jsonSource);
             rootModule.addSubUnit(cur.fromSisu(subGroupId));
         }
     }
