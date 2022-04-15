@@ -45,7 +45,7 @@ public class ModuleReaderTest {
      */
     @Test
     public void testFromSisu() {
-        ModuleReader mod = new ModuleReader();
+        ModuleReader mod = new ModuleReader(new UrlJsonFetcher());
         Module testModule = mod.fromSisu("uta-ok-ykoodi-41176");
         
         assertEquals(testModule.getName(), "Basic Studies in Computer Sciences");
@@ -85,7 +85,7 @@ public class ModuleReaderTest {
         String groupId2 = "uta-tohjelma-1705";
         String geriatryTestId = "otm-7eb812ae-2f0a-4e3a-ac06-bf4695df3fad";
         
-        ModuleReader mr = new ModuleReader();
+        ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
         
         ArrayList<String> courseUnitData = mr.getSubGroupIds(groupId1).get("unit");
         ArrayList<String> moduleData = mr.getSubGroupIds(groupId2).get("module");
@@ -116,7 +116,7 @@ public class ModuleReaderTest {
     @Test
     public void testGatherSubs() {
         String geriatryTestId = "otm-7eb812ae-2f0a-4e3a-ac06-bf4695df3fad";
-        ModuleReader mr = new ModuleReader();
+        ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
         Module testDP = mr.fromSisu(geriatryTestId);
         
         CourseUnit testCU = testDP.getSubModules().get(0).getSubUnits().get(0);
@@ -127,26 +127,26 @@ public class ModuleReaderTest {
 
     @Test
     public void testNumberOfSubs() {
-        ModuleReader mr = new ModuleReader();
+        ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
         Module testDP;
         String groupId = "";
         ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        for ( int i = 0; i < ids.size(); i++ ) {
+        for ( int i =259; i < ids.size(); i++ ) {
             groupId = ids.get(i);
             testDP = mr.fromSisu(groupId);
             // Test prints
-            /*
+            
             System.err.println(i + "\n");
             System.err.println(testDP.toString(""));
-            */
+            
             testModuleSubCount(testDP);
         }
     }
     
     @Test
     public void testPrintDegreesToGroupIds() {
-        ModuleReader mr = new ModuleReader();
+        ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
         TreeMap<String, String> degrees = mr.getDegreeGroupIdPairs();
         
         // Test prints
