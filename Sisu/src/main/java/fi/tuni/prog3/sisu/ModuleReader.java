@@ -29,6 +29,7 @@ public class ModuleReader {
      */
     public Module buildModule(String groupId) {
         JsonObject rootElement = getJsonFromSource(groupId);
+        Module result;
         
         JsonObject nameObject = rootElement.get("name").getAsJsonObject();
         String name;
@@ -53,19 +54,16 @@ public class ModuleReader {
                 }
             }
             
-            StudyModule result = new StudyModule(credits, name, id, groupId, organizers);
-            gatherSubs(result);
-            return result;
+            result = new StudyModule(credits, name, id, groupId, organizers);
         } else if (type.equals("DegreeProgramme")) {
             int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
-            DegreeProgramme result = new DegreeProgramme(credits, name, id, groupId);
-            gatherSubs(result);
-            return result;
+            result = new DegreeProgramme(credits, name, id, groupId);
         } else {
-            GroupingModule result = new GroupingModule(name, id, groupId);
-            gatherSubs(result);
-            return result;
+            result = new GroupingModule(name, id, groupId);
         }
+        
+        gatherSubs(result);
+        return result;
     }
     
     /**
