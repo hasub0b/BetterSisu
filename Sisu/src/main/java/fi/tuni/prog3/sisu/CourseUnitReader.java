@@ -14,17 +14,24 @@ import java.util.TreeMap;
  * @author Leo
  */
 public class CourseUnitReader {
+    // JsonStringFetcher as a source for JSON data
+    private JsonStringFetcher jsonSource;
+    
+    /**
+     * Constructor for CourseUnitReader
+     * @param jsonSource Source to get JSON data from
+     */
+    public CourseUnitReader(JsonStringFetcher jsonSource) {
+        this.jsonSource = jsonSource;
+    }
+    
     /**
      * Get CourseUnit of groupId from SISU
      * @param groupId groupId of CourseUnit to get
      * @return CourseUnit object of groupId
      */
     public CourseUnit fromSisu(String groupId) {
-        Gson gson = new Gson();
-        String jsonString = UrlJsonFetcher.getCourseUnit(groupId);
-        JsonReader jreader = new JsonReader(new StringReader(jsonString));
-        jreader.setLenient(true);
-        JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
+        JsonObject rootElement = getJsonFromSource(groupId);
         
         // names
         String enName = getEnAttribute(rootElement, "name");
@@ -111,5 +118,13 @@ public class CourseUnitReader {
         result.put("max", maxCredits);
         
         return result;
+    }
+    
+    private JsonObject getJsonFromSource(String groupId) {
+        Gson gson = new Gson();
+        String jsonString = jsonSource.getCourseUnit(groupId);
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
+        jreader.setLenient(true);
+        return gson.fromJson(jreader, JsonObject.class);
     }
 }
