@@ -27,8 +27,8 @@ public class ModuleReader {
      * @param groupId Degree groupId
      * @return Module of the given groupId
      */
-    public Module fromSisu(String groupId) {
-        JsonObject rootElement = gsonFromSisu(groupId);
+    public Module buildModule(String groupId) {
+        JsonObject rootElement = getJsonFromSource(groupId);
         
         JsonObject nameObject = rootElement.get("name").getAsJsonObject();
         String name;
@@ -66,64 +66,6 @@ public class ModuleReader {
             gatherSubs(result);
             return result;
         }
-    }
-    
-    /**
-     * Get a TreeMap of degree names to groupIds
-     * @return TreeMap where keys are degree names and payloads are groupIds
-     */
-    public TreeMap<String, String> getDegreeGroupIdPairs() {
-        TreeMap<String, String> result = new TreeMap<>();
-        String name;
-        
-        for ( String groupId : getDegreeGroupIds() ) {
-            JsonObject degreeObject = gsonFromSisu(groupId).get("name").getAsJsonObject();
-            
-            if ( degreeObject.has("en") ) {
-                name = degreeObject.get("en").getAsString();
-            } else {
-                name = degreeObject.get("fi").getAsString();
-            }
-            
-            result.put(name, groupId);
-        }
-        
-        return result;
-    }
-    
-    /**
-     * Get a list of every available degree's groupIds
-     * @return ArrayList of all degree groupIds
-     */
-    public ArrayList<String> getDegreeGroupIds() {
-        Gson gson = new Gson();
-        String jsonString = UrlJsonFetcher.getDegreeList();
-        JsonReader jreader = new JsonReader(new StringReader(jsonString));
-        jreader.setLenient(true);
-        JsonObject rootObject = gson.fromJson(jreader, JsonObject.class);
-        JsonArray degreeArray = rootObject.get("searchResults").getAsJsonArray();
-        
-        ArrayList<String> result = new ArrayList<>();
-        for ( var deg : degreeArray ) {
-            result.add(deg.getAsJsonObject().get("groupId").getAsString());
-        }
-        return result;
-    }
-    
-    /**
-     * Gathers all sub-module and sub-unit groupIds into a TreeMap 
-     * where the keys are "module" and "unit" and payloads are ArrayLists of
-     * groupIds of each object type respectively.
-     * 
-     * @param groupId groupId of module to fetch sub-modules/units of
-     * @return Map where keys are "module" and "unit" and payloads are
-     * ArrayLists of groupIds of sub-modules and sub-units respectively
-     */
-    public TreeMap<String, ArrayList<String>> getSubGroupIds(String groupId) {
-        JsonObject rootElement = gsonFromSisu(groupId);
-        JsonObject rule = rootElement.get("rule").getAsJsonObject();
-        
-        return extractSubGroupIds(rule);
     }
     
     /**
@@ -185,7 +127,7 @@ public class ModuleReader {
     }
     
     /**
-     * Extract the sub-modules and sub-units from a rule JSON object. 
+     * Extract the sub-module and sub-unit groupIds from a rule JSON object. 
      * Works in conjunction with getSubRuleArray
      * @param rule JSON format rule to extract data from
      * @return Map where keys are "module" and "unit" and payloads are arrays of
@@ -219,7 +161,7 @@ public class ModuleReader {
      * @param groupId groupId of module to get
      * @return A GSON format object of module data
      */
-    private JsonObject gsonFromSisu(String groupId) {
+    private JsonObject getJsonFromSource(String groupId) {
         Gson gson = new Gson();
         String jsonString = jsonSource.getModule(groupId);
         JsonReader jreader = new JsonReader(new StringReader(jsonString));
@@ -234,12 +176,73 @@ public class ModuleReader {
     private void gatherSubs(Module rootModule) {
         // Fetch study-module's sub-modules
         for (String subGroupId : getSubGroupIds(rootModule.getGroupId()).get("module")) {
-            rootModule.addSubModule(this.fromSisu(subGroupId));
+            rootModule.addSubModule(this.buildModule(subGroupId));
         }
         // Fetch study-module's sub-units
         for (String subGroupId : getSubGroupIds(rootModule.getGroupId()).get("unit")) {
             CourseUnitReader cur = new CourseUnitReader(jsonSource);
-            rootModule.addSubUnit(cur.fromSisu(subGroupId));
+            rootModule.addSubUnit(cur.buildCourseUnit(subGroupId));
         }
+    }
+    
+    // DEGREE-LISTING FUNCTIONALITY
+    
+    /**
+     * Get a list of every available degree's groupIds. Always uses SISU since
+     * local files weren't provided.
+     * @return ArrayList of all degree groupIds
+     */
+    public ArrayList<String> getDegreeGroupIds() {
+        Gson gson = new Gson();
+        String jsonString = UrlJsonFetcher.getDegreeList();
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
+        jreader.setLenient(true);
+        JsonObject rootObject = gson.fromJson(jreader, JsonObject.class);
+        JsonArray degreeArray = rootObject.get("searchResults").getAsJsonArray();
+        
+        ArrayList<String> result = new ArrayList<>();
+        for ( var deg : degreeArray ) {
+            result.add(deg.getAsJsonObject().get("groupId").getAsString());
+        }
+        return result;
+    }
+    
+    /**
+     * Gathers all sub-module and sub-unit groupIds into a TreeMap 
+     * where the keys are "module" and "unit" and payloads are ArrayLists of
+     * groupIds of each object type respectively.
+     * 
+     * @param groupId groupId of module to fetch sub-modules/units of
+     * @return Map where keys are "module" and "unit" and payloads are
+     * ArrayLists of groupIds of sub-modules and sub-units respectively
+     */
+    public TreeMap<String, ArrayList<String>> getSubGroupIds(String groupId) {
+        JsonObject rootElement = getJsonFromSource(groupId);
+        JsonObject rule = rootElement.get("rule").getAsJsonObject();
+        
+        return extractSubGroupIds(rule);
+    }
+    
+    /**
+     * Get a TreeMap of degree names to groupIds
+     * @return TreeMap where keys are degree names and payloads are groupIds
+     */
+    public TreeMap<String, String> getDegreeGroupIdPairs() {
+        TreeMap<String, String> result = new TreeMap<>();
+        String name;
+        
+        for ( String groupId : getDegreeGroupIds() ) {
+            JsonObject degreeObject = getJsonFromSource(groupId).get("name").getAsJsonObject();
+            
+            if ( degreeObject.has("en") ) {
+                name = degreeObject.get("en").getAsString();
+            } else {
+                name = degreeObject.get("fi").getAsString();
+            }
+            
+            result.put(name, groupId);
+        }
+        
+        return result;
     }
 }

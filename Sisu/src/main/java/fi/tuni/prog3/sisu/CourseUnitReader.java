@@ -30,11 +30,11 @@ public class CourseUnitReader {
      * @param groupId groupId of CourseUnit to get
      * @return CourseUnit object of groupId
      */
-    public CourseUnit fromSisu(String groupId) {
+    public CourseUnit buildCourseUnit(String groupId) {
         JsonObject rootElement = getJsonFromSource(groupId);
         
         // names
-        String enName = getEnAttribute(rootElement, "name");
+        String enName = getAttributePrefEn(rootElement, "name");
         
         // code
         String code = "code unavailable";
@@ -55,10 +55,10 @@ public class CourseUnitReader {
         CourseUnit result = new CourseUnit(id,groupId,enName,code,minCredits,maxCredits);
 
         // addtl info
-        result.setContent(getEnAttribute(rootElement, "content"));
-        result.setPrerequisite(getEnAttribute(rootElement, "prerequisites"));
-        result.setOutcome(getEnAttribute(rootElement, "outcomes"));
-        result.setMaterial(getEnAttribute(rootElement, "learningMaterial"));
+        result.setContent(getAttributePrefEn(rootElement, "content"));
+        result.setPrerequisite(getAttributePrefEn(rootElement, "prerequisites"));
+        result.setOutcome(getAttributePrefEn(rootElement, "outcomes"));
+        result.setMaterial(getAttributePrefEn(rootElement, "learningMaterial"));
         
         return result;
     }
@@ -71,7 +71,7 @@ public class CourseUnitReader {
      * @param attName Attribute name
      * @return Attribute value if it exists, else null
      */
-    private String getEnAttribute(JsonObject rootElement, String attName) {
+    private String getAttributePrefEn(JsonObject rootElement, String attName) {
         String result = null;
         
         if ( rootElement.has(attName) ) {
