@@ -53,32 +53,6 @@ public class ModuleReaderTest {
         assertEquals(testModule.getGroupId(), "uta-ok-ykoodi-41176");
     }
     
-    /*
-     * To be implemented.
-     */
-    @Test
-    public void testFromJson() {
-        // NOTE: THIS READS INFO FROM A JSON FILE.
-        /*
-        BufferedReader testBR = null;
-        String jsonString = "";
-        try {
-            testBR = new BufferedReader(new FileReader("src/test/resources/ModuleExample.json"));
-        } catch (FileNotFoundException e) {
-            fail("Test file not found (Module)");
-        }
-        try {
-            String line = testBR.readLine();
-            while (line != null) {
-                jsonString += line;
-                line = testBR.readLine();
-            }
-        } catch (IOException e) {
-            fail("File ended unexpectedly");
-        }
-        */
-    }
-    
     @Test
     public void testGetSubModuleNames() {
         String groupId1 = "uta-ok-ykoodi-41176";
