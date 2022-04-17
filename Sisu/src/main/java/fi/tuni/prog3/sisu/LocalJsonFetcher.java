@@ -17,9 +17,10 @@ public class LocalJsonFetcher implements JsonStringFetcher {
         try {
             return getFromLocation("../json/modules/" + groupId + ".json");
         } catch (FileNotFoundException e) {
-            System.err.format("Module file not found: " + groupId);
+            System.err.format("Module file not found: " + groupId + "\n");
+            return getModule("module-not-found");
         } catch (IOException e) {
-            System.err.format("error in Module file: " + groupId);
+            System.err.format("error in Module file: " + groupId + "\n");
         }
         return null;
     }
@@ -29,9 +30,10 @@ public class LocalJsonFetcher implements JsonStringFetcher {
         try {
             return getFromLocation("../json/courseunits/" + groupId + ".json");
         } catch (FileNotFoundException e) {
-            System.err.format("CourseUnit file not found: " + groupId);
+            System.err.format("CourseUnit file not found: " + groupId + "\n");
+            return getCourseUnit("course-unit-not-found");
         } catch (IOException e) {
-            System.err.format("error in CourseUnit file: " + groupId);
+            System.err.format("error in CourseUnit file: " + groupId + "\n");
         }
         return null;
     }
