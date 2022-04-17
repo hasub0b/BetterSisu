@@ -1,0 +1,48 @@
+{
+    "learningMaterial": null,
+    "code": "none",
+    "groupId": "course-unit-unavailable",
+    "content": {
+        "fi": "Ei saatavilla",
+        "en": "Unavailable"
+    },
+    "prerequisites": {
+        "fi": "Ei saatavilla",
+        "en": "Unavailable"
+    },
+    "literature": [
+        {
+            "name": "Unavailable",
+            "type": "LiteratureName",
+            "localId": "none"
+        }
+    ],
+    "credits": {
+        "min": 0,
+        "max": 0
+    },
+    "outcomes": {
+        "fi": "<p>Kurssin suoritettuaan opiskelija  <br />- ymmärtää matemaattisen todistamisen idean ja tarpeellisuuden ja osaa hyödyntää päättelyjärjestelmää päättelyssä.  <br />- tuntee joukko-opin alkeet sekä funktioiden ja relaatioiden perusominaisuudet  <br />- on omaksunut keskeiset matemaattiset merkinnät  <br />- hallitsee kombinatoriikan perusteet, kokonaislukujen perusominaisuudet ja modulaariaritmetiikan  <br />- osaa manipuloida permutaatioryhmiä  </p>"
+    },
+    "assessmentItemOrder": [
+        "otm-b01a10d1-954b-499c-8704-90aae2a4a0e1",
+        "otm-0ffc28c2-d3d2-478a-affe-02ebfe8c8a93",
+        "otm-7d5eea7f-a27d-4ac1-9d14-23843bbd2fb0"
+    ],
+    "tweetText": {
+        "fi": "Opintojaksolla perehdytään diskreetin matematiikan peruskäsitteisiin ja -tuloksiin."
+    },
+    "id": "NA",
+    "responsibilityInfos": [
+        {
+            "validityPeriod": {},
+            "personId": "tuni-person-unavailable",
+            "roleUrn": "urn:code:module-responsibility-info-type:responsible-teacher",
+            "text": null
+        }
+    ],
+    "name": {
+        "fi": "Ei saatavilla",
+        "en": "Unavailable"
+    }
+}
