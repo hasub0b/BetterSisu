@@ -106,7 +106,7 @@ public class ModuleReaderTest {
         String groupId = "";
         ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        for ( int i =259; i < ids.size(); i++ ) {
+        for ( int i =270; i < ids.size(); i++ ) {
             groupId = ids.get(i);
             testDP = mr.buildModule(groupId);
             // Test prints
@@ -128,6 +128,16 @@ public class ModuleReaderTest {
         for ( String key : degrees.keySet() ) {
             System.err.println(String.format("%-101s %s", key, degrees.get(key)));
         }
+        */
+    }
+    
+    public void testLocalBuilding() {
+        ModuleReader mr = new ModuleReader(new LocalJsonFetcher());
+        
+        Module testModule = mr.buildModule("tut-dp-g-1180");
+        
+        /*
+        System.err.println(testModule.toString(""));
         */
     }
     
