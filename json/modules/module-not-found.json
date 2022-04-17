@@ -24,5 +24,8 @@
     "name": {
         "fi": "Ei saatavilla",
         "en": "Unavailable"
+    },
+    "rule": {
+    	"type": "AnyCourseUnitRule"
     }
 }
