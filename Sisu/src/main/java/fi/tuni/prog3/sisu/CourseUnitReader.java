@@ -26,6 +26,13 @@ public class CourseUnitReader {
     }
     
     /**
+     * Giving no JSON source leads to the reader using URL SISU
+     */
+    public CourseUnitReader() {
+        this.jsonSource = new UrlJsonFetcher();
+    }
+    
+    /**
      * Get CourseUnit of groupId from SISU
      * @param groupId groupId of CourseUnit to get
      * @return CourseUnit object of groupId

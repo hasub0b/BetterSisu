@@ -18,8 +18,19 @@ public class ModuleReader {
     
     private JsonStringFetcher jsonSource;
     
+    /**
+     * Constructor for ModuleReader
+     * @param jsonSource Source to get JSON data from
+     */
     public ModuleReader(JsonStringFetcher jsonSource) {
         this.jsonSource = jsonSource;
+    }
+    
+    /**
+     * Giving no jsonSource parameter leads to using URL SISU as source
+     */
+    public ModuleReader() {
+        this.jsonSource = new UrlJsonFetcher();
     }
     
     /**
@@ -43,23 +54,29 @@ public class ModuleReader {
         String id = rootElement.get("id").getAsString();
         String type = rootElement.get("type").getAsString();
         
-        if ( type.equals("StudyModule") ) {
-            int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
-            ArrayList<String> organizers = new ArrayList<>();
-            if ( !rootElement.get("responsibilityInfos").isJsonNull() ) {
-                for (var person : rootElement.get("responsibilityInfos").getAsJsonArray()) {
-                    if ( !person.getAsJsonObject().get("personId").isJsonNull() ) {
-                        organizers.add(person.getAsJsonObject().get("personId").getAsString());
-                    }
+        switch (type) {
+            case "StudyModule":
+                {
+                    int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
+                    ArrayList<String> organizers = new ArrayList<>();
+                    if ( !rootElement.get("responsibilityInfos").isJsonNull() ) {
+                        for (var person : rootElement.get("responsibilityInfos").getAsJsonArray()) {
+                            if ( !person.getAsJsonObject().get("personId").isJsonNull() ) {
+                                organizers.add(person.getAsJsonObject().get("personId").getAsString());
+                            }
+                        }
+                    }       result = new StudyModule(credits, name, id, groupId, organizers);
+                    break;
                 }
-            }
-            
-            result = new StudyModule(credits, name, id, groupId, organizers);
-        } else if (type.equals("DegreeProgramme")) {
-            int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
-            result = new DegreeProgramme(credits, name, id, groupId);
-        } else {
-            result = new GroupingModule(name, id, groupId);
+            case "DegreeProgramme":
+                {
+                    int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
+                    result = new DegreeProgramme(credits, name, id, groupId);
+                    break;
+                }
+            default:
+                result = new GroupingModule(name, id, groupId);
+                break;
         }
         
         gatherSubs(result);
@@ -82,39 +99,43 @@ public class ModuleReader {
             return rules;
         }
         
-        // Repeating structure to navigate through rules
-        while ( true )  {
+        OUTER:
+        while (true) {
             ruleType = rule.get("type").getAsString();
             // Handle CompositeRule
-            if ( ruleType.equals("CompositeRule") ) {
-                JsonArray subRules = rule.get("rules").getAsJsonArray();
-                
-                // If this CompositeRule doesn't have subRules, break
-                if ( subRules.isEmpty() ) {break;}  
-                
-                // Check if this CompositeRule has inner composite/credits-rules
-                Boolean hasDeeperRules = false;
-                for ( var aRule : subRules ) {
-                    String aRuleType = aRule.getAsJsonObject().get("type").getAsString();
-                    if (aRuleType.equals("CompositeRule") || aRuleType.equals("CreditsRule")) {
-                        hasDeeperRules = true;
+            switch (ruleType) {
+                case "CompositeRule":
+                    JsonArray subRules = rule.get("rules").getAsJsonArray();
+                    // If this CompositeRule doesn't have subRules, break
+                    if (subRules.isEmpty()) {
+                        break OUTER;
                     }
-                }
-                // If this Composite contains only Modules and Units, break
-                if ( !hasDeeperRules ) {break;}
-
-                // compile all deeper rules under one composite
-                JsonArray subRuleArray = new JsonArray();
-                for ( var subRule : subRules ) {
-                    subRuleArray.addAll(getSubRuleArray(subRule.getAsJsonObject()));
-                }
-                // Replace sub-rules with gathered rules
-                rule.remove("rules");
-                rule.add("rules", subRuleArray);
-            // Handle CreditsRule
-            } else if ( ruleType.equals("CreditsRule") ) {
-                rule = rule.get("rule").getAsJsonObject();
-            } else {break;} //Break if current rule isn't composite or credits
+                    // Check if this CompositeRule has inner composite/credits-rules
+                    Boolean hasDeeperRules = false;
+                    for ( var aRule : subRules ) {
+                        String aRuleType = aRule.getAsJsonObject().get("type").getAsString();
+                        if (aRuleType.equals("CompositeRule") || aRuleType.equals("CreditsRule")) {
+                            hasDeeperRules = true;
+                        }
+                    }   // If this Composite contains only Modules and Units, break
+                    if (!hasDeeperRules) {
+                        break OUTER;
+                    }
+                    // compile all deeper rules under one composite
+                    JsonArray subRuleArray = new JsonArray();
+                    for ( var subRule : subRules ) {
+                        subRuleArray.addAll(getSubRuleArray(subRule.getAsJsonObject()));
+                    }   // Replace sub-rules with gathered rules
+                    rule.remove("rules");
+                    rule.add("rules", subRuleArray);
+                    // Handle CreditsRule
+                    break;
+                case "CreditsRule":
+                    rule = rule.get("rule").getAsJsonObject();
+                    break;
+                default:
+                    break OUTER; //Break if current rule isn't composite or credits
+            }
         }
         
         // account for empty modules
