@@ -9,9 +9,9 @@ import java.util.ArrayList;
  */
 public class Student implements Comparable<Student> {
 
-    private final String firstName;
-    private final String lastName;
-    private final String studentId;
+    private String firstName;
+    private String lastName;
+    private String studentId;
     private ArrayList<DegreeProgramme> programmes;
 
     public Student(String firstName, String lastName, String studentId, ArrayList<DegreeProgramme> programmes) {
@@ -23,6 +23,13 @@ public class Student implements Comparable<Student> {
 
     public Student(String firstName, String lastName, String studentId) {
         this(firstName, lastName, studentId, new ArrayList<DegreeProgramme>());
+    }
+
+    public Student() {
+        this.firstName = new String();
+        this.lastName = new String();
+        this.studentId = new String();
+        this.programmes = new ArrayList<>();
     }
 
     public String getFirstName() {
@@ -39,6 +46,26 @@ public class Student implements Comparable<Student> {
 
     public ArrayList<DegreeProgramme> getProgrammes() {
         return programmes;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
+
+    public void setProgrammes(ArrayList<DegreeProgramme> programmes) {
+        this.programmes = programmes;
+    }
+
+    public void addProgramme(DegreeProgramme programme) {
+        programmes.add(programme);
     }
 
     @Override
