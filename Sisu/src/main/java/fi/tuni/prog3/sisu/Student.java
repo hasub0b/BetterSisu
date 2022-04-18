@@ -85,4 +85,10 @@ public class Student implements Comparable<Student> {
 
         return result;
     }
+
+    public boolean equals(Student other) {
+        return (lastName.equalsIgnoreCase(other.getLastName())
+                && firstName.equalsIgnoreCase(other.getFirstName())
+                && studentId.equalsIgnoreCase(other.getStudentId()));
+    }
 }
