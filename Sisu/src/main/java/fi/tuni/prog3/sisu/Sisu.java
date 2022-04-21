@@ -11,10 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -31,6 +28,7 @@ import java.util.Objects;
 
 public class Sisu extends Application {
 
+    ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
 
     Tab studentTab = new Tab();
     Tab studiesTab = new Tab();
@@ -41,6 +39,7 @@ public class Sisu extends Application {
     TextField searchbar = new TextField();
     List<TreeItem> courses = new ArrayList<>();
 
+    TreeMap<String, String> degreeGroupIdPairs = new TreeMap<>();
 
     EventHandler eh = new EventHandler<ActionEvent>() {
         @Override
@@ -67,7 +66,8 @@ public class Sisu extends Application {
                 }
             } else if (event.getSource() instanceof ComboBox) {
                 if (event.getSource() == degreeBox) {
-                    createFieldOfStudyOptions(degreeBox.getSelectionModel().getSelectedItem().toString());
+                    // createFieldOfStudyOptions(degreeBox.getSelectionModel().getSelectedItem().toString());
+                    createFieldOfStudyOptions2(degreeBox.getSelectionModel().getSelectedItem().toString());
                 } else if (event.getSource() == fieldOfStudyBox) {
                     createStudiesTab(fieldOfStudyBox.getSelectionModel().getSelectedItem().toString());
                 }
@@ -83,13 +83,12 @@ public class Sisu extends Application {
 
 
 
-
-
     @Override
     public void start(Stage stage) {
 
         TabPane tabPane = new TabPane();
-        createStudentTab();
+        //createStudentTab();
+        createStudentTab2();
         createStudiesTab(fieldOfStudyBox.getSelectionModel().getSelectedItem().toString());
         tabPane.getTabs().add(studentTab);
         tabPane.getTabs().add(studiesTab);
@@ -119,6 +118,7 @@ public class Sisu extends Application {
     }
 
     // only for demo
+    /*
     public void createStudentTab(){
 
         VBox vBox = new VBox();
@@ -148,9 +148,43 @@ public class Sisu extends Application {
 
         studentTab.setText("Opiskelijan tiedot");
         studentTab.setContent(vBox);
+    }*/
+
+    public void createStudentTab2(){
+
+        VBox vBox = new VBox();
+        Label studentLabel = new Label("OPISKELIJA");
+        vBox.getChildren().add(studentLabel);
+        Label degreeField = new Label("Valitse tutkinto-ohjelma:");
+        vBox.getChildren().add(degreeField);
+
+
+        ArrayList<String> degrees = new ArrayList<>();
+
+        degreeGroupIdPairs = mr.getDegreeGroupIdPairs();
+        for (Map.Entry<String, String> entry : degreeGroupIdPairs.entrySet()){
+            degrees.add(entry.getKey());
+        }
+
+        ObservableList<String> oDegrees = FXCollections.observableArrayList(degrees);
+        degreeBox = new ComboBox(oDegrees);
+        degreeBox.getSelectionModel().selectFirst();
+        degreeBox.setOnAction(eh);
+
+        vBox.getChildren().add(degreeBox);
+
+        Label fieldOfStudyLabel = new Label("Valitse opintosuuntaus:");
+        vBox.getChildren().add(fieldOfStudyLabel);
+
+        createFieldOfStudyOptions2(degreeBox.getValue().toString());
+        vBox.getChildren().add(fieldOfStudyBox);
+
+        studentTab.setText("Opiskelijan tiedot");
+        studentTab.setContent(vBox);
     }
 
     // only  for demo
+    /*
     public void createFieldOfStudyOptions(String option){
         ObservableList<String> options =
                 FXCollections.observableArrayList(
@@ -160,6 +194,19 @@ public class Sisu extends Application {
         fieldOfStudyBox.setItems(options);
         fieldOfStudyBox.setOnAction(eh);
         fieldOfStudyBox.getSelectionModel().selectFirst();
+    }*/
+    public void createFieldOfStudyOptions2(String name){
+        String groupId = degreeGroupIdPairs.get(name);
+        Module degree = mr.buildModule(groupId);
+        ArrayList<String> options = new ArrayList<>();
+        for (Module subModule : degree.getSubModules()){
+            options.add(subModule.getName());
+        }
+        ObservableList<String> observableListOptions = FXCollections.observableList(options);
+        fieldOfStudyBox.setItems(observableListOptions);
+        fieldOfStudyBox.setOnAction(eh);
+        fieldOfStudyBox.getSelectionModel().selectFirst();
+
     }
 
     // only for demo
@@ -257,6 +304,9 @@ public class Sisu extends Application {
 
 
     }
+
+
+
 
     public static void main(String[] args) {
         launch();
