@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 
@@ -37,6 +38,7 @@ public class Sisu extends Application {
     ComboBox degreeBox = new ComboBox();
     TreeView treeView = new TreeView();
     VBox checkBoxes = new VBox();
+    TextField searchbar = new TextField();
     List<TreeItem> courses = new ArrayList<>();
 
 
@@ -68,9 +70,13 @@ public class Sisu extends Application {
                     createFieldOfStudyOptions(degreeBox.getSelectionModel().getSelectedItem().toString());
                 } else if (event.getSource() == fieldOfStudyBox) {
                     createStudiesTab(fieldOfStudyBox.getSelectionModel().getSelectedItem().toString());
-                } else {
-                    System.out.println("EVENT NOT RECOGNIZED");
                 }
+            } else if (event.getSource() instanceof TextField){
+
+            }
+
+            else {
+                System.out.println("EVENT NOT RECOGNIZED");
             }
         }
     };
@@ -168,11 +174,20 @@ public class Sisu extends Application {
         treeView = createTreeView(degreeProgramme);
         studiesTabHBox.getChildren().add(treeView);
 
-        // searchbar and checkbox menu
+        // searchbar
         VBox studiesTabRightSide = new VBox();
-        TextField searchbar = new TextField();
+        searchbar = new TextField();
+        searchbar.textProperty().addListener((observable, oldValue, newValue) -> {
+            checkBoxes.getChildren().clear();
+            for (TreeItem course : courses){
+                if (course.getValue().toString().toLowerCase(Locale.ROOT).contains(newValue.toLowerCase(Locale.ROOT))){
+                    addCheckBox(course.getValue().toString());
+                }
+            }
+        });
         studiesTabRightSide.getChildren().add(searchbar);
 
+        // checkboxes
         checkBoxes.getChildren().clear();
         studiesTabRightSide.getChildren().add(checkBoxes);
 
@@ -194,7 +209,6 @@ public class Sisu extends Application {
         }
         treeView.setRoot(rootItem);
         treeView.getSelectionModel().selectedItemProperty().addListener((v, oldValue, newValue) -> {
-            System.out.println("Action on "+ newValue);
             TreeItem selected = (TreeItem) newValue;
             checkBoxes.getChildren().clear();
             if (selected.toString().contains("StudyModule")){
