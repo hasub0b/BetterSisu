@@ -39,31 +39,25 @@ public class CourseUnitReaderTest {
     }
 
     @Test
-    public void testFromString() {
-        BufferedReader testBR = null;
-        String jsonString = "";
-        try {
-            testBR = new BufferedReader(new FileReader("src/test/resources/courseUnitExample.json"));
-        } catch (FileNotFoundException e) {
-            fail("Test file not found (Course unit)");
-        }
-        try {
-            String line = testBR.readLine();
-            while (line != null) {
-                line = testBR.readLine();
-                jsonString += line;
-            }
-        } catch (IOException e) {
-            fail("File ended unexpectedly");
-        }
-        
-        CourseUnitReader cur = new CourseUnitReader();
-        CourseUnit testCU = cur.fromString(jsonString);
+    public void testBuildCourseUnit() {
+        CourseUnitReader cur = new CourseUnitReader(new UrlJsonFetcher());
+        CourseUnit testCU = cur.buildCourseUnit("uta-ykoodi-47926");
         
         assertEquals(testCU.getName(), "Introduction to Analysis");
         assertEquals(testCU.getCode(), "MATH.MA.110");
         assertEquals(testCU.getCourseUnitGroupId(), "uta-ykoodi-47926");
-        assertEquals(testCU.getCredits(), 5);
+        assertEquals(testCU.getMaxCredits(), 5);
         assertEquals(testCU.getId(), "otm-94ffcfc5-0db4-4507-b475-63f290639e04");
+    }
+    
+    @Test
+    public void testAdditionalInfo() {
+        CourseUnitReader cur = new CourseUnitReader(new UrlJsonFetcher());
+        CourseUnit testCU = cur.buildCourseUnit("uta-ykoodi-47926");
+        
+        assertTrue(testCU.getOutcome().endsWith(" muuttujan funktioita."));
+        assertTrue(testCU.getPrerequisite().endsWith(" kurssit<br /></p>"));
+        assertTrue(testCU.getContent().endsWith(" integrointi <br /></p>"));
+        assertTrue(testCU.getMaterial().endsWith(" jaettava materiaali.</p>"));
     }
 }

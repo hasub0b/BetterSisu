@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import java.io.StringReader;
+import java.util.TreeMap;
 
 /**
  * Turn CourseUnit JSON-format string into CourseUnit object
@@ -13,36 +14,124 @@ import java.io.StringReader;
  * @author Leo
  */
 public class CourseUnitReader {
-    public CourseUnit fromString(String s) {
-        Gson gson = new Gson();
-        JsonReader jreader = new JsonReader(new StringReader(s));
-        jreader.setLenient(true);
-        JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
+    // JsonStringFetcher as a source for JSON data
+    private JsonStringFetcher jsonSource;
+    
+    /**
+     * Constructor for CourseUnitReader
+     * @param jsonSource Source to get JSON data from
+     */
+    public CourseUnitReader(JsonStringFetcher jsonSource) {
+        this.jsonSource = jsonSource;
+    }
+    
+    /**
+     * Giving no JSON source leads to the reader using URL SISU
+     */
+    public CourseUnitReader() {
+        this.jsonSource = new UrlJsonFetcher();
+    }
+    
+    /**
+     * Get CourseUnit of groupId from SISU
+     * @param groupId groupId of CourseUnit to get
+     * @return CourseUnit object of groupId
+     */
+    public CourseUnit buildCourseUnit(String groupId) {
+        JsonObject rootElement = getJsonFromSource(groupId);
         
         // names
-        JsonElement namesElement = rootElement.get("name");
-        JsonElement en_name_element = namesElement.getAsJsonObject().get("en");
-        String en_name = en_name_element.getAsString();
-        JsonElement fi_name_element = namesElement.getAsJsonObject().get("fi");
-        String fi_name = fi_name_element.getAsString();
+        String enName = getAttributePrefEn(rootElement, "name");
         
         // code
+        String code = "code unavailable";
         JsonElement codeElement = rootElement.get("code");
-        String code = codeElement.getAsString();
+        if ( !codeElement.isJsonNull() ) {
+            code = codeElement.getAsString();
+        }
         
-        // groupId
-        JsonElement groupIdElement = rootElement.get("groupId");
-        String groupId = groupIdElement.getAsString();
-        
-        // max credits
-        JsonElement creditsElement = rootElement.get("credits");
-        JsonElement maxCreditElement = creditsElement.getAsJsonObject().get("max");
-        int credits = maxCreditElement.getAsInt();
+        // credits
+        int minCredits = getMinMaxCredits(rootElement).get("min");
+        int maxCredits = getMinMaxCredits(rootElement).get("max");
         
         // course id
         JsonElement idElement = rootElement.get("id");
         String id = idElement.getAsString();
         
-        return new CourseUnit(id,groupId,en_name,code,credits);
+        // initialize result
+        CourseUnit result = new CourseUnit(id,groupId,enName,code,minCredits,maxCredits);
+
+        // addtl info
+        result.setContent(getAttributePrefEn(rootElement, "content"));
+        result.setPrerequisite(getAttributePrefEn(rootElement, "prerequisites"));
+        result.setOutcome(getAttributePrefEn(rootElement, "outcomes"));
+        result.setMaterial(getAttributePrefEn(rootElement, "learningMaterial"));
+        
+        return result;
+    }
+    
+    /**
+     * Get an English attribute from JsonObject.
+     * If English attribute is unavailable, return Finnish attribute.
+     * If no attribute is available, return null.
+     * @param rootElement Object to get element from
+     * @param attName Attribute name
+     * @return Attribute value if it exists, else null
+     */
+    private String getAttributePrefEn(JsonObject rootElement, String attName) {
+        String result = null;
+        
+        if ( rootElement.has(attName) ) {
+            if (!rootElement.get(attName).isJsonNull()) {
+                JsonObject contentLangObj = rootElement.get(attName).getAsJsonObject();
+                if ( contentLangObj.has("en") ) {
+                    result = contentLangObj.get("en").getAsString();
+                } else {
+                    result = contentLangObj.get("fi").getAsString();
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private TreeMap<String, Integer> getMinMaxCredits(JsonObject rootElement) {
+        JsonObject creditsObject = rootElement.get("credits").getAsJsonObject();
+        JsonElement creditElement = null;
+        int maxCredits = 0;
+        int minCredits = 0;
+        if (creditsObject.has("max")) {
+            creditElement = creditsObject.getAsJsonObject().get("max");
+            if ( !creditElement.isJsonNull() ) {
+                maxCredits = creditElement.getAsInt();
+            }
+        }   
+        if (creditsObject.has("min")) {
+            creditElement = creditsObject.getAsJsonObject().get("min");
+            if ( !creditElement.isJsonNull() ) {
+                minCredits = creditElement.getAsInt();
+            }
+        } else {
+            // if a minimum credits limit hasn't been defined, use max
+            minCredits = maxCredits;
+        }
+        // if min credits was defined and max wasn't, use min as max
+        if ( minCredits > maxCredits) {
+            maxCredits = minCredits;
+        }
+        
+        TreeMap<String, Integer> result = new TreeMap<>();
+        result.put("min", minCredits);
+        result.put("max", maxCredits);
+        
+        return result;
+    }
+    
+    private JsonObject getJsonFromSource(String groupId) {
+        Gson gson = new Gson();
+        String jsonString = jsonSource.getCourseUnit(groupId);
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
+        jreader.setLenient(true);
+        return gson.fromJson(jreader, JsonObject.class);
     }
 }
