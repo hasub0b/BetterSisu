@@ -1,0 +1,43 @@
+{
+    "learningMaterial": null,
+    "code": "none",
+    "groupId": "course-unit-unavailable",
+    "content": {
+        "fi": "Ei saatavilla",
+        "en": "Unavailable"
+    },
+    "prerequisites": {
+        "fi": "Ei saatavilla",
+        "en": "Unavailable"
+    },
+    "literature": [
+        {
+            "name": "Unavailable",
+            "type": "LiteratureName",
+            "localId": "none"
+        }
+    ],
+    "credits": {
+        "min": 0,
+        "max": 0
+    },
+    "outcomes": {
+        "fi": "Ei saatavilla"
+    },
+    "tweetText": {
+        "fi": "Ei saatavilla"
+    },
+    "id": "NA",
+    "responsibilityInfos": [
+        {
+            "validityPeriod": {},
+            "personId": "tuni-person-unavailable",
+            "roleUrn": "urn:code:module-responsibility-info-type:responsible-teacher",
+            "text": null
+        }
+    ],
+    "name": {
+        "fi": "Ei saatavilla",
+        "en": "Unavailable"
+    }
+}

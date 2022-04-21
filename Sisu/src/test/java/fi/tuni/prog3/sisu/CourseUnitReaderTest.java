@@ -39,9 +39,9 @@ public class CourseUnitReaderTest {
     }
 
     @Test
-    public void testFromSisu() {
-        CourseUnitReader cur = new CourseUnitReader();
-        CourseUnit testCU = cur.fromSisu("uta-ykoodi-47926");
+    public void testBuildCourseUnit() {
+        CourseUnitReader cur = new CourseUnitReader(new UrlJsonFetcher());
+        CourseUnit testCU = cur.buildCourseUnit("uta-ykoodi-47926");
         
         assertEquals(testCU.getName(), "Introduction to Analysis");
         assertEquals(testCU.getCode(), "MATH.MA.110");
@@ -52,8 +52,8 @@ public class CourseUnitReaderTest {
     
     @Test
     public void testAdditionalInfo() {
-        CourseUnitReader cur = new CourseUnitReader();
-        CourseUnit testCU = cur.fromSisu("uta-ykoodi-47926");
+        CourseUnitReader cur = new CourseUnitReader(new UrlJsonFetcher());
+        CourseUnit testCU = cur.buildCourseUnit("uta-ykoodi-47926");
         
         assertTrue(testCU.getOutcome().endsWith(" muuttujan funktioita."));
         assertTrue(testCU.getPrerequisite().endsWith(" kurssit<br /></p>"));

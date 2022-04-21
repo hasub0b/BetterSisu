@@ -1,0 +1,31 @@
+{
+    "code": "NA",
+    "groupId": "module-not-found",
+    "rule": {},
+    "type": "StudyModule",
+    "contentDescription": null,
+    "additionalInfo": null,
+    "learningOutcomes": {
+        "en": "none"
+    },
+    "id": "none",
+    "targetCredits": {
+        "min": 120,
+        "max": null
+    },
+    "responsibilityInfos": [
+        {
+            "validityPeriod": {},
+            "personId": "tuni-person-unavailable",
+            "roleUrn": "urn:code:module-responsibility-info-type:administrative-person",
+            "text": null
+        }
+    ],
+    "name": {
+        "fi": "Ei saatavilla",
+        "en": "Unavailable"
+    },
+    "rule": {
+    	"type": "AnyCourseUnitRule"
+    }
+}

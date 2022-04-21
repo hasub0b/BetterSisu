@@ -15,13 +15,32 @@ import java.util.TreeMap;
  * @author Leo
  */
 public class ModuleReader {
+    
+    private JsonStringFetcher jsonSource;
+    
+    /**
+     * Constructor for ModuleReader
+     * @param jsonSource Source to get JSON data from
+     */
+    public ModuleReader(JsonStringFetcher jsonSource) {
+        this.jsonSource = jsonSource;
+    }
+    
+    /**
+     * Giving no jsonSource parameter leads to using URL SISU as source
+     */
+    public ModuleReader() {
+        this.jsonSource = new UrlJsonFetcher();
+    }
+    
     /**
      * Get a module from SISU using module groupId
      * @param groupId Degree groupId
      * @return Module of the given groupId
      */
-    public Module fromSisu(String groupId) {
-        JsonObject rootElement = gsonFromSisu(groupId);
+    public Module buildModule(String groupId) {
+        JsonObject rootElement = getJsonFromSource(groupId);
+        Module result;
         
         JsonObject nameObject = rootElement.get("name").getAsJsonObject();
         String name;
@@ -35,88 +54,33 @@ public class ModuleReader {
         String id = rootElement.get("id").getAsString();
         String type = rootElement.get("type").getAsString();
         
-        if ( type.equals("StudyModule") ) {
-            int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
-            ArrayList<String> organizers = new ArrayList<>();
-            if ( !rootElement.get("responsibilityInfos").isJsonNull() ) {
-                for (var person : rootElement.get("responsibilityInfos").getAsJsonArray()) {
-                    if ( !person.getAsJsonObject().get("personId").isJsonNull() ) {
-                        organizers.add(person.getAsJsonObject().get("personId").getAsString());
-                    }
+        switch (type) {
+            case "StudyModule":
+                {
+                    int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
+                    ArrayList<String> organizers = new ArrayList<>();
+                    if ( !rootElement.get("responsibilityInfos").isJsonNull() ) {
+                        for (var person : rootElement.get("responsibilityInfos").getAsJsonArray()) {
+                            if ( !person.getAsJsonObject().get("personId").isJsonNull() ) {
+                                organizers.add(person.getAsJsonObject().get("personId").getAsString());
+                            }
+                        }
+                    }       result = new StudyModule(credits, name, id, groupId, organizers);
+                    break;
                 }
-            }
-            
-            StudyModule result = new StudyModule(credits, name, id, groupId, organizers);
-            gatherSubs(result);
-            return result;
-        } else if (type.equals("DegreeProgramme")) {
-            int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
-            DegreeProgramme result = new DegreeProgramme(credits, name, id, groupId);
-            gatherSubs(result);
-            return result;
-        } else {
-            GroupingModule result = new GroupingModule(name, id, groupId);
-            gatherSubs(result);
-            return result;
-        }
-    }
-    
-    /**
-     * Get a TreeMap of degree names to groupIds
-     * @return TreeMap where keys are degree names and payloads are groupIds
-     */
-    public TreeMap<String, String> getDegreeGroupIdPairs() {
-        TreeMap<String, String> result = new TreeMap<>();
-        String name;
-        
-        for ( String groupId : getDegreeGroupIds() ) {
-            JsonObject degreeObject = gsonFromSisu(groupId).get("name").getAsJsonObject();
-            
-            if ( degreeObject.has("en") ) {
-                name = degreeObject.get("en").getAsString();
-            } else {
-                name = degreeObject.get("fi").getAsString();
-            }
-            
-            result.put(name, groupId);
+            case "DegreeProgramme":
+                {
+                    int credits = rootElement.get("targetCredits").getAsJsonObject().get("min").getAsInt();
+                    result = new DegreeProgramme(credits, name, id, groupId);
+                    break;
+                }
+            default:
+                result = new GroupingModule(name, id, groupId);
+                break;
         }
         
+        gatherSubs(result);
         return result;
-    }
-    
-    /**
-     * Get a list of every available degree's groupIds
-     * @return ArrayList of all degree groupIds
-     */
-    public ArrayList<String> getDegreeGroupIds() {
-        Gson gson = new Gson();
-        String jsonString = UrlJsonFetcher.getDegreeList();
-        JsonReader jreader = new JsonReader(new StringReader(jsonString));
-        jreader.setLenient(true);
-        JsonObject rootObject = gson.fromJson(jreader, JsonObject.class);
-        JsonArray degreeArray = rootObject.get("searchResults").getAsJsonArray();
-        
-        ArrayList<String> result = new ArrayList<>();
-        for ( var deg : degreeArray ) {
-            result.add(deg.getAsJsonObject().get("groupId").getAsString());
-        }
-        return result;
-    }
-    
-    /**
-     * Gathers all sub-module and sub-unit groupIds into a TreeMap 
-     * where the keys are "module" and "unit" and payloads are ArrayLists of
-     * groupIds of each object type respectively.
-     * 
-     * @param groupId groupId of module to fetch sub-modules/units of
-     * @return Map where keys are "module" and "unit" and payloads are
-     * ArrayLists of groupIds of sub-modules and sub-units respectively
-     */
-    public TreeMap<String, ArrayList<String>> getSubGroupIds(String groupId) {
-        JsonObject rootElement = gsonFromSisu(groupId);
-        JsonObject rule = rootElement.get("rule").getAsJsonObject();
-        
-        return extractSubGroupIds(rule);
     }
     
     /**
@@ -135,39 +99,43 @@ public class ModuleReader {
             return rules;
         }
         
-        // Repeating structure to navigate through rules
-        while ( true )  {
+        OUTER:
+        while (true) {
             ruleType = rule.get("type").getAsString();
             // Handle CompositeRule
-            if ( ruleType.equals("CompositeRule") ) {
-                JsonArray subRules = rule.get("rules").getAsJsonArray();
-                
-                // If this CompositeRule doesn't have subRules, break
-                if ( subRules.isEmpty() ) {break;}  
-                
-                // Check if this CompositeRule has inner composite/credits-rules
-                Boolean hasDeeperRules = false;
-                for ( var aRule : subRules ) {
-                    String aRuleType = aRule.getAsJsonObject().get("type").getAsString();
-                    if (aRuleType.equals("CompositeRule") || aRuleType.equals("CreditsRule")) {
-                        hasDeeperRules = true;
+            switch (ruleType) {
+                case "CompositeRule":
+                    JsonArray subRules = rule.get("rules").getAsJsonArray();
+                    // If this CompositeRule doesn't have subRules, break
+                    if (subRules.isEmpty()) {
+                        break OUTER;
                     }
-                }
-                // If this Composite contains only Modules and Units, break
-                if ( !hasDeeperRules ) {break;}
-
-                // compile all deeper rules under one composite
-                JsonArray subRuleArray = new JsonArray();
-                for ( var subRule : subRules ) {
-                    subRuleArray.addAll(getSubRuleArray(subRule.getAsJsonObject()));
-                }
-                // Replace sub-rules with gathered rules
-                rule.remove("rules");
-                rule.add("rules", subRuleArray);
-            // Handle CreditsRule
-            } else if ( ruleType.equals("CreditsRule") ) {
-                rule = rule.get("rule").getAsJsonObject();
-            } else {break;} //Break if current rule isn't composite or credits
+                    // Check if this CompositeRule has inner composite/credits-rules
+                    Boolean hasDeeperRules = false;
+                    for ( var aRule : subRules ) {
+                        String aRuleType = aRule.getAsJsonObject().get("type").getAsString();
+                        if (aRuleType.equals("CompositeRule") || aRuleType.equals("CreditsRule")) {
+                            hasDeeperRules = true;
+                        }
+                    }   // If this Composite contains only Modules and Units, break
+                    if (!hasDeeperRules) {
+                        break OUTER;
+                    }
+                    // compile all deeper rules under one composite
+                    JsonArray subRuleArray = new JsonArray();
+                    for ( var subRule : subRules ) {
+                        subRuleArray.addAll(getSubRuleArray(subRule.getAsJsonObject()));
+                    }   // Replace sub-rules with gathered rules
+                    rule.remove("rules");
+                    rule.add("rules", subRuleArray);
+                    // Handle CreditsRule
+                    break;
+                case "CreditsRule":
+                    rule = rule.get("rule").getAsJsonObject();
+                    break;
+                default:
+                    break OUTER; //Break if current rule isn't composite or credits
+            }
         }
         
         // account for empty modules
@@ -178,7 +146,7 @@ public class ModuleReader {
     }
     
     /**
-     * Extract the sub-modules and sub-units from a rule JSON object. 
+     * Extract the sub-module and sub-unit groupIds from a rule JSON object. 
      * Works in conjunction with getSubRuleArray
      * @param rule JSON format rule to extract data from
      * @return Map where keys are "module" and "unit" and payloads are arrays of
@@ -212,9 +180,9 @@ public class ModuleReader {
      * @param groupId groupId of module to get
      * @return A GSON format object of module data
      */
-    private JsonObject gsonFromSisu(String groupId) {
+    private JsonObject getJsonFromSource(String groupId) {
         Gson gson = new Gson();
-        String jsonString = UrlJsonFetcher.getModule(groupId);
+        String jsonString = jsonSource.getModule(groupId);
         JsonReader jreader = new JsonReader(new StringReader(jsonString));
         jreader.setLenient(true);
         return gson.fromJson(jreader, JsonObject.class);
@@ -227,12 +195,73 @@ public class ModuleReader {
     private void gatherSubs(Module rootModule) {
         // Fetch study-module's sub-modules
         for (String subGroupId : getSubGroupIds(rootModule.getGroupId()).get("module")) {
-            rootModule.addSubModule(this.fromSisu(subGroupId));
+            rootModule.addSubModule(this.buildModule(subGroupId));
         }
         // Fetch study-module's sub-units
         for (String subGroupId : getSubGroupIds(rootModule.getGroupId()).get("unit")) {
-            CourseUnitReader cur = new CourseUnitReader();
-            rootModule.addSubUnit(cur.fromSisu(subGroupId));
+            CourseUnitReader cur = new CourseUnitReader(jsonSource);
+            rootModule.addSubUnit(cur.buildCourseUnit(subGroupId));
         }
+    }
+    
+    // DEGREE-LISTING FUNCTIONALITY
+    
+    /**
+     * Get a list of every available degree's groupIds. Always uses SISU since
+     * local files weren't provided.
+     * @return ArrayList of all degree groupIds
+     */
+    public ArrayList<String> getDegreeGroupIds() {
+        Gson gson = new Gson();
+        String jsonString = UrlJsonFetcher.getDegreeList();
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
+        jreader.setLenient(true);
+        JsonObject rootObject = gson.fromJson(jreader, JsonObject.class);
+        JsonArray degreeArray = rootObject.get("searchResults").getAsJsonArray();
+        
+        ArrayList<String> result = new ArrayList<>();
+        for ( var deg : degreeArray ) {
+            result.add(deg.getAsJsonObject().get("groupId").getAsString());
+        }
+        return result;
+    }
+    
+    /**
+     * Gathers all sub-module and sub-unit groupIds into a TreeMap 
+     * where the keys are "module" and "unit" and payloads are ArrayLists of
+     * groupIds of each object type respectively.
+     * 
+     * @param groupId groupId of module to fetch sub-modules/units of
+     * @return Map where keys are "module" and "unit" and payloads are
+     * ArrayLists of groupIds of sub-modules and sub-units respectively
+     */
+    public TreeMap<String, ArrayList<String>> getSubGroupIds(String groupId) {
+        JsonObject rootElement = getJsonFromSource(groupId);
+        JsonObject rule = rootElement.get("rule").getAsJsonObject();
+        
+        return extractSubGroupIds(rule);
+    }
+    
+    /**
+     * Get a TreeMap of degree names to groupIds
+     * @return TreeMap where keys are degree names and payloads are groupIds
+     */
+    public TreeMap<String, String> getDegreeGroupIdPairs() {
+        TreeMap<String, String> result = new TreeMap<>();
+        String name;
+        
+        for ( String groupId : getDegreeGroupIds() ) {
+            JsonObject degreeObject = getJsonFromSource(groupId).get("name").getAsJsonObject();
+            
+            if ( degreeObject.has("en") ) {
+                name = degreeObject.get("en").getAsString();
+            } else {
+                name = degreeObject.get("fi").getAsString();
+            }
+            
+            result.put(name, groupId);
+        }
+        
+        return result;
     }
 }

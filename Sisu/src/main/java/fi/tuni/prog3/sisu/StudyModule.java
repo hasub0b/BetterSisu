@@ -44,7 +44,7 @@ public class StudyModule extends DegreeProgramme {
         String result = String.format("%sMODULE: %s Organizers (%d)", 
                 indent, getName(), getOrganizers().size());
         
-        if ( getOrganizers().size() != 0 ) {
+        if ( !getOrganizers().isEmpty() ) {
             result += String.format(": %s et al.\n", getOrganizers().get(0));
         } else {
             result += "\n";

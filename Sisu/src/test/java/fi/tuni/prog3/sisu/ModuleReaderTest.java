@@ -44,39 +44,13 @@ public class ModuleReaderTest {
      * Tests non-recursive parts of fromString. Recursive part in future test!
      */
     @Test
-    public void testFromSisu() {
-        ModuleReader mod = new ModuleReader();
-        Module testModule = mod.fromSisu("uta-ok-ykoodi-41176");
+    public void testBuildModule() {
+        ModuleReader mod = new ModuleReader(new UrlJsonFetcher());
+        Module testModule = mod.buildModule("uta-ok-ykoodi-41176");
         
         assertEquals(testModule.getName(), "Basic Studies in Computer Sciences");
         assertEquals(testModule.getId(), "otm-af70be28-9bf5-49f7-b8fc-41a2bafbf2f2");
         assertEquals(testModule.getGroupId(), "uta-ok-ykoodi-41176");
-    }
-    
-    /*
-     * To be implemented.
-     */
-    @Test
-    public void testFromJson() {
-        // NOTE: THIS READS INFO FROM A JSON FILE.
-        /*
-        BufferedReader testBR = null;
-        String jsonString = "";
-        try {
-            testBR = new BufferedReader(new FileReader("src/test/resources/ModuleExample.json"));
-        } catch (FileNotFoundException e) {
-            fail("Test file not found (Module)");
-        }
-        try {
-            String line = testBR.readLine();
-            while (line != null) {
-                jsonString += line;
-                line = testBR.readLine();
-            }
-        } catch (IOException e) {
-            fail("File ended unexpectedly");
-        }
-        */
     }
     
     @Test
@@ -85,7 +59,7 @@ public class ModuleReaderTest {
         String groupId2 = "uta-tohjelma-1705";
         String geriatryTestId = "otm-7eb812ae-2f0a-4e3a-ac06-bf4695df3fad";
         
-        ModuleReader mr = new ModuleReader();
+        ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
         
         ArrayList<String> courseUnitData = mr.getSubGroupIds(groupId1).get("unit");
         ArrayList<String> moduleData = mr.getSubGroupIds(groupId2).get("module");
@@ -116,8 +90,8 @@ public class ModuleReaderTest {
     @Test
     public void testGatherSubs() {
         String geriatryTestId = "otm-7eb812ae-2f0a-4e3a-ac06-bf4695df3fad";
-        ModuleReader mr = new ModuleReader();
-        Module testDP = mr.fromSisu(geriatryTestId);
+        ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
+        Module testDP = mr.buildModule(geriatryTestId);
         
         CourseUnit testCU = testDP.getSubModules().get(0).getSubUnits().get(0);
         String testCUName = testCU.getName();
@@ -127,26 +101,26 @@ public class ModuleReaderTest {
 
     @Test
     public void testNumberOfSubs() {
-        ModuleReader mr = new ModuleReader();
+        ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
         Module testDP;
         String groupId = "";
         ArrayList<String> ids = mr.getDegreeGroupIds();
         
-        for ( int i = 0; i < ids.size(); i++ ) {
+        for ( int i =270; i < ids.size(); i++ ) {
             groupId = ids.get(i);
-            testDP = mr.fromSisu(groupId);
+            testDP = mr.buildModule(groupId);
             // Test prints
-            /*
+            
             System.err.println(i + "\n");
             System.err.println(testDP.toString(""));
-            */
+            
             testModuleSubCount(testDP);
         }
     }
     
     @Test
     public void testPrintDegreesToGroupIds() {
-        ModuleReader mr = new ModuleReader();
+        ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
         TreeMap<String, String> degrees = mr.getDegreeGroupIdPairs();
         
         // Test prints
@@ -154,6 +128,16 @@ public class ModuleReaderTest {
         for ( String key : degrees.keySet() ) {
             System.err.println(String.format("%-101s %s", key, degrees.get(key)));
         }
+        */
+    }
+    
+    public void testLocalBuilding() {
+        ModuleReader mr = new ModuleReader(new LocalJsonFetcher());
+        
+        Module testModule = mr.buildModule("tut-dp-g-1180");
+        
+        /*
+        System.err.println(testModule.toString(""));
         */
     }
     
@@ -168,8 +152,9 @@ public class ModuleReaderTest {
         Expected amounts are determined by how many times each respective
         rule type is found in the json.
         */
-        int expectedSubUnits = UrlJsonFetcher.getModule(groupId).split("\"CourseUnitRule\"").length-1;
-        int expectedSubModules = UrlJsonFetcher.getModule(groupId).split("\"ModuleRule\"").length-1;
+        JsonStringFetcher jsf = new UrlJsonFetcher();
+        int expectedSubUnits = jsf.getModule(groupId).split("\"CourseUnitRule\"").length-1;
+        int expectedSubModules = jsf.getModule(groupId).split("\"ModuleRule\"").length-1;
         assertEquals(subModule.getSubUnits().size(), expectedSubUnits);
         assertEquals(subModule.getSubModules().size(), expectedSubModules);
             

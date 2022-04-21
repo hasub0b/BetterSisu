@@ -14,20 +14,34 @@ import java.util.TreeMap;
  * @author Leo
  */
 public class CourseUnitReader {
+    // JsonStringFetcher as a source for JSON data
+    private JsonStringFetcher jsonSource;
+    
+    /**
+     * Constructor for CourseUnitReader
+     * @param jsonSource Source to get JSON data from
+     */
+    public CourseUnitReader(JsonStringFetcher jsonSource) {
+        this.jsonSource = jsonSource;
+    }
+    
+    /**
+     * Giving no JSON source leads to the reader using URL SISU
+     */
+    public CourseUnitReader() {
+        this.jsonSource = new UrlJsonFetcher();
+    }
+    
     /**
      * Get CourseUnit of groupId from SISU
      * @param groupId groupId of CourseUnit to get
      * @return CourseUnit object of groupId
      */
-    public CourseUnit fromSisu(String groupId) {
-        Gson gson = new Gson();
-        String jsonString = UrlJsonFetcher.getCourseUnit(groupId);
-        JsonReader jreader = new JsonReader(new StringReader(jsonString));
-        jreader.setLenient(true);
-        JsonObject rootElement = gson.fromJson(jreader, JsonObject.class);
+    public CourseUnit buildCourseUnit(String groupId) {
+        JsonObject rootElement = getJsonFromSource(groupId);
         
         // names
-        String enName = getEnAttribute(rootElement, "name");
+        String enName = getAttributePrefEn(rootElement, "name");
         
         // code
         String code = "code unavailable";
@@ -48,10 +62,10 @@ public class CourseUnitReader {
         CourseUnit result = new CourseUnit(id,groupId,enName,code,minCredits,maxCredits);
 
         // addtl info
-        result.setContent(getEnAttribute(rootElement, "content"));
-        result.setPrerequisite(getEnAttribute(rootElement, "prerequisites"));
-        result.setOutcome(getEnAttribute(rootElement, "outcomes"));
-        result.setMaterial(getEnAttribute(rootElement, "learningMaterial"));
+        result.setContent(getAttributePrefEn(rootElement, "content"));
+        result.setPrerequisite(getAttributePrefEn(rootElement, "prerequisites"));
+        result.setOutcome(getAttributePrefEn(rootElement, "outcomes"));
+        result.setMaterial(getAttributePrefEn(rootElement, "learningMaterial"));
         
         return result;
     }
@@ -64,7 +78,7 @@ public class CourseUnitReader {
      * @param attName Attribute name
      * @return Attribute value if it exists, else null
      */
-    private String getEnAttribute(JsonObject rootElement, String attName) {
+    private String getAttributePrefEn(JsonObject rootElement, String attName) {
         String result = null;
         
         if ( rootElement.has(attName) ) {
@@ -111,5 +125,13 @@ public class CourseUnitReader {
         result.put("max", maxCredits);
         
         return result;
+    }
+    
+    private JsonObject getJsonFromSource(String groupId) {
+        Gson gson = new Gson();
+        String jsonString = jsonSource.getCourseUnit(groupId);
+        JsonReader jreader = new JsonReader(new StringReader(jsonString));
+        jreader.setLenient(true);
+        return gson.fromJson(jreader, JsonObject.class);
     }
 }
