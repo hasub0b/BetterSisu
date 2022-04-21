@@ -45,26 +45,31 @@ public class Sisu extends Application {
         public void handle(ActionEvent event) {
             if (event.getSource() instanceof CheckBox) {
                 CheckBox chk = (CheckBox) event.getSource();
-                System.out.println("action on "+chk.toString());
                 TreeItem selected = (TreeItem) treeView.getSelectionModel().getSelectedItem();
-                for (TreeItem course : courses){
-                    if (Objects.equals(chk.getText(), course.getValue())){
-                        if (chk.isSelected()){
+                for (TreeItem course : courses) {
+                    if (Objects.equals(chk.getText(), course.getValue())) {
+                        if (chk.isSelected()) {
                             selected.getChildren().add(course);
                         } else {
-                            System.out.println("remove");
-                            for (Object ob : selected.getChildren())
-                            {
+                            for (Object ob : selected.getChildren()) {
                                 TreeItem treeOb = (TreeItem) ob;
                                 System.out.println(treeOb.getValue());
                                 System.out.println(chk.getText());
-                                if (Objects.equals(chk.getText(), treeOb.getValue())){
+                                if (Objects.equals(chk.getText(), treeOb.getValue())) {
                                     selected.getChildren().remove(ob);
                                     break;
                                 }
                             }
                         }
                     }
+                }
+            } else if (event.getSource() instanceof ComboBox) {
+                if (event.getSource() == degreeBox) {
+                    createFieldOfStudyOptions(degreeBox.getSelectionModel().getSelectedItem().toString());
+                } else if (event.getSource() == fieldOfStudyBox) {
+                    createStudiesTab(fieldOfStudyBox.getSelectionModel().getSelectedItem().toString());
+                } else {
+                    System.out.println("EVENT NOT RECOGNIZED");
                 }
             }
         }
@@ -89,25 +94,20 @@ public class Sisu extends Application {
         stage.setScene(scene);
         stage.show();
 
-        degreeBox.setOnAction((e) -> {
-            createFieldOfStudyOptions(degreeBox.getSelectionModel().getSelectedItem().toString());
-        });
-        fieldOfStudyBox.setOnAction((e) -> {
-            createStudiesTab(fieldOfStudyBox.getSelectionModel().getSelectedItem().toString());
-        });
+        // degreeBox.setOnAction((e) -> createFieldOfStudyOptions(degreeBox.getSelectionModel().getSelectedItem().toString()));
+        // fieldOfStudyBox.setOnAction((e) -> createStudiesTab(fieldOfStudyBox.getSelectionModel().getSelectedItem().toString()));
 
-        treeView.getSelectionModel().selectedItemProperty().addListener((v, oldValue, newValue) -> {
-            TreeItem selected = (TreeItem) newValue;
-            checkBoxes.getChildren().clear();
-
-            if (selected.toString().contains("StudyModule")){
-                getCourses();
-                for (TreeItem course : courses){
-                    addCheckBox(course.getValue().toString());
-                }
-
-            }
-        });
+        // treeView.getSelectionModel().selectedItemProperty().addListener((v, oldValue, newValue) -> {
+        //    System.out.println("Action on "+ newValue);
+        //    TreeItem selected = (TreeItem) newValue;
+        //    checkBoxes.getChildren().clear();
+        //    if (selected.toString().contains("StudyModule")){
+        //        getCourses();
+        //        for (TreeItem course : courses){
+        //            addCheckBox(course.getValue().toString());
+        //        }
+        //    }
+        // });
 
 
     }
@@ -130,6 +130,7 @@ public class Sisu extends Application {
 
         degreeBox = new ComboBox(options);
         degreeBox.getSelectionModel().selectFirst();
+        degreeBox.setOnAction(eh);
 
         vBox.getChildren().add(degreeBox);
 
@@ -151,6 +152,7 @@ public class Sisu extends Application {
                         option+" b"
                 );
         fieldOfStudyBox.setItems(options);
+        fieldOfStudyBox.setOnAction(eh);
         fieldOfStudyBox.getSelectionModel().selectFirst();
     }
 
@@ -171,6 +173,7 @@ public class Sisu extends Application {
         TextField searchbar = new TextField();
         studiesTabRightSide.getChildren().add(searchbar);
 
+        checkBoxes.getChildren().clear();
         studiesTabRightSide.getChildren().add(checkBoxes);
 
         studiesTabHBox.getChildren().add(studiesTabRightSide);
@@ -190,6 +193,17 @@ public class Sisu extends Application {
             rootItem.getChildren().add(studyModule);
         }
         treeView.setRoot(rootItem);
+        treeView.getSelectionModel().selectedItemProperty().addListener((v, oldValue, newValue) -> {
+            System.out.println("Action on "+ newValue);
+            TreeItem selected = (TreeItem) newValue;
+            checkBoxes.getChildren().clear();
+            if (selected.toString().contains("StudyModule")){
+                getCourses();
+                for (TreeItem course : courses){
+                    addCheckBox(course.getValue().toString());
+                }
+            }
+        });
         return treeView;
     }
 
@@ -211,17 +225,6 @@ public class Sisu extends Application {
         }*/
     }
 
-    // only for demo
-    public VBox createCheckbox(String module){
-        checkBoxes = new VBox();
-        for (int i = 0; i < 6; ++i){
-            CheckBox checkBox = new CheckBox(module+i);
-            checkBoxes.getChildren().add(checkBox);
-
-        }
-        return checkBoxes;
-    }
-
     public void addCheckBox(String course){
         CheckBox checkBox = new CheckBox(course);
         checkBox.setText(course);
@@ -239,97 +242,6 @@ public class Sisu extends Application {
         checkBoxes.getChildren().add(checkBox);
 
 
-    }
-
-    public Tab createStudentTab(Module module){
-        Tab studentTab = new Tab("Opiskelijan teidot");
-
-        VBox vBox = new VBox();
-        Label studentLabel = new Label("OPISKELIJA");
-        vBox.getChildren().add(studentLabel);
-
-        Label degreeField = new Label("Valitse tutkinto-ohjelma:");
-        vBox.getChildren().add(degreeField);
-        ObservableList<Module> options = getOptions(module);
-        ComboBox degreeBox = new ComboBox(options);
-        vBox.getChildren().add(degreeBox);
-
-        Label fieldOfStudyLabel = new Label("Valitse opintosuuntaus:");
-        vBox.getChildren().add(fieldOfStudyLabel);
-        ComboBox fieldOfStudyBox = new ComboBox();
-        vBox.getChildren().add(fieldOfStudyBox);
-
-        studentTab.setContent(vBox);
-
-        return studentTab;
-    }
-
-    public ObservableList<Module> getOptions(Module module){
-        ObservableList<Module> options = FXCollections.observableArrayList(module.getSubModules());
-
-        return options;
-    }
-
-    public Tab createStudiesTab(DegreeProgramme degreeProgramme){
-        Tab studiesTab = new Tab("Opintojen rakenne");
-        VBox studiesTabLabelVBox = new VBox();
-        Label studiesLabel = new Label("OPINTOJEN RAKENNE");
-        studiesTabLabelVBox.getChildren().add(studiesLabel);
-        HBox studiesTabHBox = new HBox();
-        studiesTabLabelVBox.getChildren().add(studiesTabHBox);
-
-        // create TreeView
-        TreeView treeView = createTreeView(degreeProgramme);
-        treeView.setPrefSize(300,500);
-        studiesTabHBox.getChildren().add(treeView);
-
-        // searchbar and checkbox menu
-        VBox studiesTabRightSide = new VBox();
-        TextField searchbar = new TextField();
-        studiesTabRightSide.getChildren().add(searchbar);
-
-        VBox checkBox = createCheckbox(degreeProgramme);
-        studiesTabRightSide.getChildren().add(checkBox);
-
-        studiesTabHBox.getChildren().add(studiesTabRightSide);
-        studiesTab.setContent(studiesTabHBox);
-
-        return studiesTab;
-    }
-
-    public TreeView createTreeView(DegreeProgramme degreeProgramme){
-
-        TreeView treeView = new TreeView();
-        treeView.setPrefSize(250,500);
-        TreeItem rootItem = createTreeItem(degreeProgramme);
-        treeView.setRoot(rootItem);
-
-        return treeView;
-    }
-
-    public TreeItem createTreeItem(Module module){
-        TreeItem treeItem = new TreeItem(module.getName());
-
-        if (!module.getSubModules().isEmpty()){
-            for(Module subModule : module.getSubModules()){
-                createTreeItem(subModule);
-            }
-        }
-        if (!module.getSubUnits().isEmpty()){
-            for (CourseUnit courseUnit : module.getSubUnits()) {
-                treeItem.getChildren().add(new TreeItem(courseUnit.getName()));
-            }
-        }
-        return treeItem;
-    }
-
-    public VBox createCheckbox(Module module){
-        VBox vBox = new VBox();
-        for (CourseUnit course : module.getSubUnits()){
-            CheckBox checkBox = new CheckBox(course.getName());
-            vBox.getChildren().add(checkBox);
-        }
-        return vBox;
     }
 
     public static void main(String[] args) {
