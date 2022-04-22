@@ -34,6 +34,7 @@ public class StudentWriter {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .serializeNulls()
+                .registerTypeAdapter(Module.class, new ModuleAdapter())
                 .create();
 
         try ( BufferedWriter bw = Files.newBufferedWriter(studentFile)) {
