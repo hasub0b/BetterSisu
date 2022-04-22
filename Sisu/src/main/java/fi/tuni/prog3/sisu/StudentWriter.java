@@ -17,6 +17,13 @@ public class StudentWriter {
 
     private static final String DEFAULT_PATH = "saveddata/students/";
 
+    /**
+     * Saves a single Student as a JSON file to specified directory.
+     *
+     * @param directory directory to save to
+     * @param student Student to save
+     * @throws IOException when unable to perform write
+     */
     public void write(String directory, Student student) throws IOException {
         // make sure directory exists
         Path dir = Paths.get(directory);
@@ -33,19 +40,39 @@ public class StudentWriter {
         }
     }
 
+    /**
+     * Uses a default path of saveddata/students/ to save Student file to.
+     *
+     * @param student Student to save
+     * @throws IOException when unable to perform write
+     */
     public void write(Student student) throws IOException {
         write(DEFAULT_PATH, student);
     }
 
-    public void writeAll(Collection<Student> students) throws IOException {
-        for (Student student : students) {
-            write(DEFAULT_PATH, student);
-        }
-    }
-
+    /**
+     * Saves every Student in collection to separate JSON files in specified
+     * directory.
+     *
+     * @param directory directory to save to
+     * @param students Collection of Students to save
+     * @throws IOException when unable to perform write
+     */
     public void writeAll(String directory, Collection<Student> students) throws IOException {
         for (Student student : students) {
             write(directory, student);
+        }
+    }
+
+    /**
+     * Uses a default path of saveddata/students/ to save Student files to.
+     *
+     * @param students Collection of Students to save
+     * @throws IOException when unable to perform write
+     */
+    public void writeAll(Collection<Student> students) throws IOException {
+        for (Student student : students) {
+            write(DEFAULT_PATH, student);
         }
     }
 }
