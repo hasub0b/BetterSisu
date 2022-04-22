@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 
 /**
+ * Stores Students as JSON files in local storage.
  *
  * @author Jyri
  */
