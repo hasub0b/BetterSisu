@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Creates Students from JSON files.
  *
  * @author Jyri
  */
@@ -20,6 +21,14 @@ public class StudentReader {
 
     private static final String DEFAULT_PATH = "saveddata/students/";
 
+    /**
+     * Reads a Student with given id from directory.
+     *
+     * @param directory directory to read from
+     * @param studentId id for Student to read
+     * @return Student with attributes specified in JSON file
+     * @throws IOException when unable to perform read operation
+     */
     public Student read(String directory, String studentId) throws IOException {
         // make sure directory exists
         Path dir = Paths.get(directory);
@@ -40,13 +49,13 @@ public class StudentReader {
         if (!Files.isRegularFile(studentFile)) {
             throw new IllegalArgumentException("Not a valid student id: " + studentId);
         }
-        
+
         Student student;
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Module.class, new ModuleAdapter())
+                .create();
 
         try ( BufferedReader br = Files.newBufferedReader(studentFile)) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Module.class, new ModuleAdapter())
-                    .create();
             student = gson.fromJson(br, Student.class);
         }
 
@@ -54,11 +63,25 @@ public class StudentReader {
 
     }
 
+    /**
+     * Reads a Student with given id from saveddata/students/.
+     *
+     * @param studentId id for Student to read
+     * @return Student with attributes specified in JSON file
+     * @throws IOException when unable to perform read operation
+     */
     public Student read(String studentId) throws IOException {
         Student s = read(DEFAULT_PATH, studentId);
         return s;
     }
 
+    /**
+     * Reads all Students found in directory to a collection.
+     *
+     * @param directory directory to read from
+     * @return a Collection of Students
+     * @throws IOException when unable to perform read operation
+     */
     public Collection<Student> readAll(String directory) throws IOException {
         // make sure directory exists
         Path dir = Paths.get(directory);
@@ -78,8 +101,8 @@ public class StudentReader {
 
         Collection<Student> students = new ArrayList<>();
         Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Module.class, new ModuleAdapter())
-                    .create();
+                .registerTypeAdapter(Module.class, new ModuleAdapter())
+                .create();
 
         for (Path studentFile : studentFiles) {
             try ( BufferedReader br = Files.newBufferedReader(studentFile)) {
@@ -91,6 +114,12 @@ public class StudentReader {
         return students;
     }
 
+    /**
+     * Reads all Students found in saveddata/students/ to a collection.
+     *
+     * @return a Collection of Students
+     * @throws IOException when unable to perform read operation
+     */
     public Collection<Student> readAll() throws IOException {
         Collection<Student> students = readAll(DEFAULT_PATH);
         return students;
