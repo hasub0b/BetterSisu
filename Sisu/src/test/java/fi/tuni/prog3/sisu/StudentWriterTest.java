@@ -17,8 +17,7 @@ public class StudentWriterTest {
 
     private static final String PROGRAMME_ID = "uta-tohjelma-1705";
     private static final ModuleReader MR = new ModuleReader();
-    // private static final DegreeProgramme DP = (DegreeProgramme) MR.buildModule(PROGRAMME_ID);
-    private static final DegreeProgramme DP = (DegreeProgramme) MR.fromSisu(PROGRAMME_ID);
+    private static final DegreeProgramme DP = (DegreeProgramme) MR.buildModule(PROGRAMME_ID);
 
     @TempDir
     static Path tempDir;
