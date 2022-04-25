@@ -88,4 +88,9 @@ public abstract class Module {
         
         return result;
     }
+    @Override
+    public String toString(){
+        return getName();
+    }
+
 }
