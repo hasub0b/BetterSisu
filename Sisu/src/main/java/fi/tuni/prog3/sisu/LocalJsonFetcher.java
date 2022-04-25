@@ -7,8 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
- *
- * @author leoma
+ * JsonStringFetcher for the JSON files under the directory JSON.
+ * 
+ * @author Leo
  */
 public class LocalJsonFetcher implements JsonStringFetcher {
 

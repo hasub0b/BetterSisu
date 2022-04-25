@@ -9,7 +9,7 @@ import java.io.StringReader;
 import java.util.TreeMap;
 
 /**
- * Turn CourseUnit JSON-format string into CourseUnit object
+ * Read data from JSON source into CourseUnit object
  * 
  * @author Leo
  */

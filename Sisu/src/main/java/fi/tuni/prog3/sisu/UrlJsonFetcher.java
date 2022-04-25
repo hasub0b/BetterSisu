@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Handle getting JSON strings from URL strings
+ * JsonStringFetcher for remote SISU data
  *
  * @author Leo
  */
