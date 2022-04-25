@@ -143,9 +143,9 @@ public class Sisu extends Application {
     public void createStudentTab2(){
 
         VBox vBox = new VBox();
-        Label studentLabel = new Label("OPISKELIJA");
+        Label studentLabel = new Label("STUDENT");
         vBox.getChildren().add(studentLabel);
-        Label degreeField = new Label("Valitse tutkinto-ohjelma:");
+        Label degreeField = new Label("Choose a degree program:");
         vBox.getChildren().add(degreeField);
 
         ArrayList<String> degrees = new ArrayList<>();
@@ -162,13 +162,13 @@ public class Sisu extends Application {
 
         vBox.getChildren().add(degreeBox);
 
-        Label fieldOfStudyLabel = new Label("Valitse opintosuuntaus:");
+        Label fieldOfStudyLabel = new Label("Choose field:");
         vBox.getChildren().add(fieldOfStudyLabel);
 
         createFieldOfStudyOptions2(degreeBox.getValue().toString());
         vBox.getChildren().add(fieldOfStudyBox);
 
-        studentTab.setText("Opiskelijan tiedot");
+        studentTab.setText("STUDENT INFORMATION");
         studentTab.setContent(vBox);
     }
 
@@ -200,8 +200,6 @@ public class Sisu extends Application {
     public void createStudiesTab(Module degreeProgramme){
 
         VBox studiesTabLabelVBox = new VBox();
-        Label studiesLabel = new Label("OPINTOJEN RAKENNE");
-        studiesTabLabelVBox.getChildren().add(studiesLabel);
         HBox studiesTabHBox = new HBox();
         studiesTabLabelVBox.getChildren().add(studiesTabHBox);
 
@@ -228,7 +226,7 @@ public class Sisu extends Application {
         studiesTabRightSide.getChildren().add(checkBoxes);
 
         studiesTabHBox.getChildren().add(studiesTabRightSide);
-        studiesTab.setText("Opintojen rakenne");
+        studiesTab.setText("DEGREE STRUCTURE");
         studiesTab.setContent(studiesTabHBox);
     }
 
