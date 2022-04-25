@@ -87,22 +87,12 @@ public class Sisu extends Application {
                                 @Override
                                 public void run() {
 
-                                    // commented out VERY aesthetic loading screen implementation
-                                    /*
-                                    StackPane pane = new StackPane();
-                                    pane.setBackground(new Background(bI));
-                                    Stage s = new Stage();
-                                    s.setTitle("LOADING");
-                                    Scene scene = new Scene(pane);
-                                    s.setScene(scene);
-                                    s.show();
-                                    */
-
-                                    publish();
+                                    SmallLoadingScreen smallLoadingScreen = new SmallLoadingScreen();
+                                    smallLoadingScreen.setVisible(true);
+                                    smallLoadingScreen.setAlwaysOnTop(true);
                                     createFieldOfStudyOptions2(degreeBox.getSelectionModel().getSelectedItem().toString());
-                                    //createStudiesTab(fieldOfStudyBox.getSelectionModel().getSelectedItem().toString());
+                                    smallLoadingScreen.setVisible(false);
 
-                                    // s.close();
                                 }
                             });
                             return null;

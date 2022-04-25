@@ -1,34 +1,31 @@
 package fi.tuni.prog3.sisu;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JWindow;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 
 /**
  *
- * Simple JWindow displayed at the start, so the program can be loaded on the background
+ * JWindow displayed when the program loads something e.g. fields of study after user chose degree
  *
  * @author Hasu
  */
 
-public class LoadingScreen extends JWindow {
+public class SmallLoadingScreen extends JWindow {
+
+    JLabel welcomeText = new JLabel("Loading...", JLabel.CENTER);
+
 
     public static void main(String[] args) {
-        new LoadingScreen();
+        new SmallLoadingScreen();
     }
 
-    public LoadingScreen() {
+    public SmallLoadingScreen() {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -45,11 +42,10 @@ public class LoadingScreen extends JWindow {
     public void showScreen() {
 
         JPanel content = (JPanel) getContentPane();
-        content.setBackground(Color.WHITE);
 
         // Set the window's bounds, centering the window
-        int width = 700;
-        int height = 460;
+        int width = 150;
+        int height = 40;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (screen.width - width) / 2;
         int y = (screen.height - height) / 2;
@@ -57,7 +53,7 @@ public class LoadingScreen extends JWindow {
 
         // Create loading screen
         JLabel label = new JLabel();
-        JLabel welcomeText = new JLabel("WELCOME TO SISU!", JLabel.CENTER);
+        welcomeText = new JLabel("Loading...", JLabel.CENTER);
 
         content.add(label, BorderLayout.CENTER);
         label.setLayout(new GridBagLayout());
@@ -70,13 +66,39 @@ public class LoadingScreen extends JWindow {
         label.add(welcomeText,gbc);
 
 
-        ImageIcon wait = new ImageIcon("Sisu\\Loading_icon.gif");
-        label.add(new JLabel(wait), gbc);
-
-
         // Display it
         setVisible(true);
         toFront();
+        new ResourceLoader().execute();
+    }
+
+    public class ResourceLoader extends SwingWorker<Object, Object> {
+
+        @Override
+        protected Object doInBackground() throws Exception {
+
+            // update text while screen is visible
+            try {
+                int i = 0;
+                while(isVisible()){
+                    welcomeText.setText("Loading"+".".repeat(i));
+                    ++i;
+                    if (i > 3){
+                        i = 0;
+                    }
+                    Thread.sleep(500);
+                }
+            } catch (Exception e) {
+            }
+            return null;
+
+        }
+
+        @Override
+        protected void done() {
+            setVisible(false);
+        }
+
 
     }
 
