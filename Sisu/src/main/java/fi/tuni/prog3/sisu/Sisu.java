@@ -6,13 +6,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javax.swing.*;
+import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -31,6 +34,9 @@ public class Sisu extends Application {
     // ModuleReader to get data from Sisu
     ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
     TreeMap<String, String> degreeGroupIdPairs = new TreeMap<>();
+
+    // Student used to save user status
+    Student student;
 
     // These are UI objects that are updated at different parts of the code,
     // It could clear up the code to have Tabs as their own classes
@@ -132,18 +138,22 @@ public class Sisu extends Application {
 
     public void createStudentTab2(){
 
-        HBox hBox = new HBox();
-
+        javafx.scene.text.Font font = new javafx.scene.text.Font(30f);
+        javafx.scene.text.Font font1 = new javafx.scene.text.Font(20f);
         // fields for students info
         VBox studentInfo = new VBox();
-        TextField firstName = new TextField("First Name");
-        TextField lastName = new TextField("Last Name");
-        TextField studentID = new TextField("Student ID");
+        studentInfo.setAlignment(Pos.BOTTOM_CENTER);
+
+        Label firstName = new Label("First Name: " + student.getFirstName());
+        Label lastName = new Label("Last Name: " + student.getLastName());
+        Label studentID = new Label("Student ID: " + student.getStudentId());
         studentInfo.getChildren().addAll(firstName,lastName,studentID);
 
         VBox vBox = new VBox();
-        Label studentLabel = new Label("STUDENT");
+        Label studentLabel = new Label("Hey, " + student.getFirstName() + "!");
+        studentLabel.setFont(font);
         Label degreeField = new Label("Choose a degree program:");
+        degreeField.setFont(font1);
 
         ArrayList<String> degrees = new ArrayList<>();
 
@@ -158,12 +168,13 @@ public class Sisu extends Application {
         degreeBox.setOnAction(eh);
 
         Label fieldOfStudyLabel = new Label("Choose field:");
+        fieldOfStudyLabel.setFont(font1);
         createFieldOfStudyOptions2(degreeBox.getValue().toString());
 
-        vBox.getChildren().addAll(studentLabel,degreeField,degreeBox,fieldOfStudyLabel,fieldOfStudyBox);
+        vBox.getChildren().addAll(studentLabel,degreeField,degreeBox,fieldOfStudyLabel,fieldOfStudyBox,studentInfo);
         studentTab.setText("STUDENT INFORMATION");
-        hBox.getChildren().addAll(vBox,studentInfo);
-        studentTab.setContent(hBox);
+        studentTab.setContent(vBox);
+        vBox.setAlignment(Pos.CENTER);
     }
 
     public void createFieldOfStudyOptions2(String name){
@@ -250,10 +261,12 @@ public class Sisu extends Application {
     // Get CourseUnits of currently selected StudyModule
     public void getCourses(){
         courses.clear();
-        TreeItem module = (TreeItem) treeView.getSelectionModel().getSelectedItem();
-        Module md = (Module) module.getValue();
-        courses.addAll(md.getSubUnits());
-
+        try {
+            TreeItem module = (TreeItem) treeView.getSelectionModel().getSelectedItem();
+            Module md = (Module) module.getValue();
+            courses.addAll(md.getSubUnits());
+        } catch (ClassCastException ignored){
+        }
     }
 
     public void addCheckBox(CourseUnit course){
@@ -306,7 +319,15 @@ public class Sisu extends Application {
     }
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws InterruptedException {
+
+        LoginScreen login = new LoginScreen();
+
+        while (!login.isLoginEntered()){
+            Thread.sleep(50);
+        }
+
+        student = new Student(login.getFirstName(), login.getLastName(), login.getStudentID());
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
             @Override
