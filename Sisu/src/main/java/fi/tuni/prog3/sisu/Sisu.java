@@ -142,11 +142,18 @@ public class Sisu extends Application {
 
     public void createStudentTab2(){
 
+        HBox hBox = new HBox();
+
+        // fields for students info
+        VBox studentInfo = new VBox();
+        TextField firstName = new TextField("First Name");
+        TextField lastName = new TextField("Last Name");
+        TextField studentID = new TextField("Student ID");
+        studentInfo.getChildren().addAll(firstName,lastName,studentID);
+
         VBox vBox = new VBox();
         Label studentLabel = new Label("STUDENT");
-        vBox.getChildren().add(studentLabel);
         Label degreeField = new Label("Choose a degree program:");
-        vBox.getChildren().add(degreeField);
 
         ArrayList<String> degrees = new ArrayList<>();
 
@@ -160,16 +167,13 @@ public class Sisu extends Application {
         degreeBox.getSelectionModel().selectFirst();
         degreeBox.setOnAction(eh);
 
-        vBox.getChildren().add(degreeBox);
-
         Label fieldOfStudyLabel = new Label("Choose field:");
-        vBox.getChildren().add(fieldOfStudyLabel);
-
         createFieldOfStudyOptions2(degreeBox.getValue().toString());
-        vBox.getChildren().add(fieldOfStudyBox);
 
+        vBox.getChildren().addAll(studentLabel,degreeField,degreeBox,fieldOfStudyLabel,fieldOfStudyBox);
         studentTab.setText("STUDENT INFORMATION");
-        studentTab.setContent(vBox);
+        hBox.getChildren().addAll(vBox,studentInfo);
+        studentTab.setContent(hBox);
     }
 
     public void createFieldOfStudyOptions2(String name){
@@ -198,15 +202,11 @@ public class Sisu extends Application {
     }
 
     public void createStudiesTab(Module degreeProgramme){
-
-        VBox studiesTabLabelVBox = new VBox();
         HBox studiesTabHBox = new HBox();
-        studiesTabLabelVBox.getChildren().add(studiesTabHBox);
 
         // create TreeView
         treeView = createTreeView((DegreeProgramme) degreeProgramme);
         treeView.setMinWidth(700);
-        studiesTabHBox.getChildren().add(treeView);
 
         // searchbar
         VBox studiesTabRightSide = new VBox();
@@ -225,7 +225,7 @@ public class Sisu extends Application {
         checkBoxes.getChildren().clear();
         studiesTabRightSide.getChildren().add(checkBoxes);
 
-        studiesTabHBox.getChildren().add(studiesTabRightSide);
+        studiesTabHBox.getChildren().addAll(treeView,studiesTabRightSide);
         studiesTab.setText("DEGREE STRUCTURE");
         studiesTab.setContent(studiesTabHBox);
     }
@@ -318,19 +318,36 @@ public class Sisu extends Application {
     @Override
     public void start(Stage stage) {
 
-        tabPane = new TabPane();
-        tabPane.setMinSize(1500,800);
-        createStudentTab2();
-        createStudiesTab((Module)fieldOfStudyBox.getSelectionModel().getSelectedItem());
-        studentTab.setClosable(false);
-        studiesTab.setClosable(false);
-        tabPane.getTabs().add(studentTab);
-        tabPane.getTabs().add(studiesTab);
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
+            @Override
+            protected Void doInBackground() throws Exception {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        LoadingScreen loadingScreen = new LoadingScreen();
 
-        stage.setTitle("SISU");
-        Scene scene = new Scene(tabPane);
-        stage.setScene(scene);
-        stage.show();
+                        tabPane = new TabPane();
+                        tabPane.setMinSize(1500,800);
+                        createStudentTab2();
+                        createStudiesTab((Module)fieldOfStudyBox.getSelectionModel().getSelectedItem());
+                        studentTab.setClosable(false);
+                        studiesTab.setClosable(false);
+                        tabPane.getTabs().add(studentTab);
+                        tabPane.getTabs().add(studiesTab);
+
+                        stage.setTitle("SISU");
+                        Scene scene = new Scene(tabPane);
+                        stage.setScene(scene);
+
+                        loadingScreen.setVisible(false);
+                        stage.show();
+                    }
+                });
+                return null;
+            }
+        };
+        worker.execute();
+
     }
 
     public static void main(String[] args) {
