@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 /**
- * Turn JSON into Module objects
+ * Read data from given JSON source into Module objects
  * 
  * @author Leo
  */
