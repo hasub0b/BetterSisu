@@ -63,7 +63,7 @@ public class CourseUnit {
     
     @Override
     public String toString() {
-        return "COURSE: " + getName();
+        return getName() + " "+ getMaxCredits() + "cr";
     }
 }
 

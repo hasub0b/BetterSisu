@@ -58,6 +58,7 @@ public class Sisu extends Application {
                         if (chk.isSelected()) {
                             TreeItem treeItem = new TreeItem<>(course);
                             selected.getChildren().add(treeItem);
+                            handleCredits(selected,"add",course.getMaxCredits());
                         } else {
                             for (Object ob : selected.getChildren()) {
                                 TreeItem treeItem = (TreeItem) ob;
@@ -66,6 +67,7 @@ public class Sisu extends Application {
 
                                     if (Objects.equals(chk.getText(), cu.getName())) {
                                         selected.getChildren().remove(ob);
+                                        handleCredits(selected,"remove", cu.getMaxCredits());
                                         break;
                                     }
                                 } catch (ClassCastException ignored){}
@@ -86,7 +88,6 @@ public class Sisu extends Application {
                                 public void run() {
 
                                     // commented out VERY aesthetic loading screen implementation
-
                                     /*
                                     StackPane pane = new StackPane();
                                     pane.setBackground(new Background(bI));
@@ -281,6 +282,39 @@ public class Sisu extends Application {
         checkBox.setOnAction(eh);
         checkBoxes.getChildren().add(checkBox);
 
+    }
+
+    public void handleCredits(TreeItem treeItem, String operand, int credits){
+        switch (operand){
+            case "add":
+                try {
+                    DegreeProgramme dp = (DegreeProgramme) treeItem.getValue();
+                    dp.addCredits(credits);
+                    if (treeItem.getParent() != null){
+                        handleCredits(treeItem.getParent(),operand,credits);
+                    }
+                } catch (ClassCastException cce){
+                    // TreeItem is not a DegreeProgramme
+                    if (treeItem.getParent() != null){
+                        handleCredits(treeItem.getParent(),operand,credits);
+                    }
+                }
+                break;
+            case "remove":
+                try {
+                    DegreeProgramme dp = (DegreeProgramme) treeItem.getValue();
+                    dp.removeCredits(credits);
+                    if (treeItem.getParent() != null){
+                        handleCredits(treeItem.getParent(),operand,credits);
+                    }
+                } catch (ClassCastException cce){
+                    // TreeItem is not a DegreeProgramme
+                    if (treeItem.getParent() != null){
+                        handleCredits(treeItem.getParent(),operand,credits);
+                    }
+                }
+                break;
+        }
     }
 
     @Override
