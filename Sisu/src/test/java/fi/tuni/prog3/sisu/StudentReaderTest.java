@@ -97,4 +97,28 @@ public class StudentReaderTest {
             CAUSES PROBLEM IN PIPELINE */ 
         }
     }
+    
+    @Test
+    public void testExists() {
+        StudentReader sr = new StudentReader();
+        try {
+            assertFalse(sr.exists(tempDir.toString(), "123"));
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        
+        Student s = new Student("a", "b", "123");
+        StudentWriter sw = new StudentWriter();
+        try {
+            sw.write(tempDir.toString(), s);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        
+        try {
+            assertTrue(sr.exists(tempDir.toString(), "123"));
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
 }
