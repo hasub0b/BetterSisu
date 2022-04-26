@@ -76,13 +76,6 @@ public class StudentTest {
     }
 
     @Test
-    public void testSetStudentId() {
-        String expected = "Another ID";
-        testStudent.setStudentId(expected);
-        assertEquals(testStudent.getStudentId(), expected);
-    }
-
-    @Test
     public void testSetProgrammes() {
         ArrayList<DegreeProgramme> newList = new ArrayList<>(List.of(SECOND_PROGRAMME));
         testStudent.setProgrammes(newList);
