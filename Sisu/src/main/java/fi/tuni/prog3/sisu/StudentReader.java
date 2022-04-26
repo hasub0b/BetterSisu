@@ -124,4 +124,18 @@ public class StudentReader {
         Collection<Student> students = readAll(DEFAULT_PATH);
         return students;
     }
+    
+    public Boolean exists(String studentId) throws IOException {
+        return exists(DEFAULT_PATH, studentId);
+    }
+    
+    public Boolean exists(String directory, String studentId) throws IOException {
+        Collection<Student> students = readAll(directory);
+        for (Student s: students) {
+            if (s.getStudentId().equals(studentId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
