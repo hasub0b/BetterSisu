@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,5 +67,12 @@ public class UrlJsonFetcherTest {
         UrlJsonFetcher ujf = new UrlJsonFetcher();
         String testCourseUnit = ujf.getCourseUnit("uta-ykoodi-47926");
         assertTrue(testCourseUnit.endsWith("\"inclusionApplicationInstruction\":null}"));
+    }
+    
+    @Test
+    public void testUnavailable() {
+        UrlJsonFetcher ujf = new UrlJsonFetcher();
+        assertTrue(ujf.getCourseUnit("nonExistent").endsWith("\"Unavailable\"    }}"));
+        assertTrue(ujf.getModule("nonExistent").endsWith("\"AnyCourseUnitRule\"    }}"));
     }
 }
