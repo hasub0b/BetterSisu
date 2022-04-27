@@ -22,6 +22,9 @@ public class CourseUnit {
     String outcome;
     String material;
 
+    // boolean to determine if the course is selected on the TreeView
+    boolean selected = false;
+
     public CourseUnit(String id, String groupId, String name, String code, int minCredits, int maxCredits) {
         this.id = id;
         this.courseUnitGroupId = groupId;
@@ -60,6 +63,18 @@ public class CourseUnit {
     public Boolean hasPrerequisite() {return (prerequisite != null);}
     public Boolean hasOutcome() {return (outcome != null);}
     public Boolean hasMaterial() {return (material != null);}
+
+    public boolean getSelected(){
+        return selected;
+    }
+
+    public void setSelected(){
+        if (selected) {
+            selected = false;
+        } else {
+            selected = true;
+        }
+    }
     
     @Override
     public String toString() {

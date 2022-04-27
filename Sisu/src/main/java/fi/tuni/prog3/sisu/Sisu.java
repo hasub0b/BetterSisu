@@ -9,13 +9,15 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
 import javax.swing.*;
-import java.awt.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -35,6 +37,10 @@ public class Sisu extends Application {
     ModuleReader mr = new ModuleReader(new UrlJsonFetcher());
     TreeMap<String, String> degreeGroupIdPairs = new TreeMap<>();
 
+    //StudentReader to handle Student data
+    StudentReader sr = new StudentReader();
+    boolean existingProgramme = false;
+
     // Student used to save user status
     Student student;
 
@@ -48,6 +54,8 @@ public class Sisu extends Application {
     TreeView treeView = new TreeView();
     VBox checkBoxes = new VBox();
     TextField searchbar = new TextField();
+    Button saveButton = new Button("SAVE");
+
 
     // Save all courses of selected TreeItem
     List<CourseUnit> courses = new ArrayList<>();
@@ -65,6 +73,7 @@ public class Sisu extends Application {
                             TreeItem treeItem = new TreeItem<>(course);
                             selected.getChildren().add(treeItem);
                             handleCredits(selected,"add",course.getMaxCredits());
+                            course.setSelected();
                         } else {
                             for (Object ob : selected.getChildren()) {
                                 TreeItem treeItem = (TreeItem) ob;
@@ -74,6 +83,7 @@ public class Sisu extends Application {
                                     if (Objects.equals(chk.getText(), cu.getName())) {
                                         selected.getChildren().remove(ob);
                                         handleCredits(selected,"remove", cu.getMaxCredits());
+                                        course.setSelected();
                                         break;
                                     }
                                 } catch (ClassCastException ignored){}
@@ -128,6 +138,10 @@ public class Sisu extends Application {
             } else if(event.getSource() instanceof TextField){
                 // Searchbar listener defined in createStudiesTab
             }
+            // Save button
+            else if (event.getSource() instanceof Button){
+                save();
+            }
 
             else {
                 // If this error message comes, ActionEvent for that UI object is yet to be implemented
@@ -136,14 +150,13 @@ public class Sisu extends Application {
         }
     };
 
-    public void createStudentTab2(){
+    public void createStudentTab(){
 
         javafx.scene.text.Font font = new javafx.scene.text.Font(30f);
         javafx.scene.text.Font font1 = new javafx.scene.text.Font(20f);
         // fields for students info
         VBox studentInfo = new VBox();
         studentInfo.setAlignment(Pos.BOTTOM_CENTER);
-
         Label firstName = new Label("First Name: " + student.getFirstName());
         Label lastName = new Label("Last Name: " + student.getLastName());
         Label studentID = new Label("Student ID: " + student.getStudentId());
@@ -164,12 +177,21 @@ public class Sisu extends Application {
 
         ObservableList<String> oDegrees = FXCollections.observableArrayList(degrees);
         degreeBox = new ComboBox(oDegrees);
-        degreeBox.getSelectionModel().selectFirst();
+        if (existingProgramme){
+            for (Map.Entry<String, String> entry : degreeGroupIdPairs.entrySet()){
+                if (Objects.equals(entry.getValue(), student.getDegrees().get(0))){
+                    degreeBox.getSelectionModel().select(entry.getKey());
+                }
+            }
+        } else {
+            degreeBox.getSelectionModel().selectFirst();
+        }
         degreeBox.setOnAction(eh);
 
         Label fieldOfStudyLabel = new Label("Choose field:");
         fieldOfStudyLabel.setFont(font1);
-        createFieldOfStudyOptions2(degreeBox.getValue().toString());
+
+        createFieldOfStudyOptions2(degreeBox.getSelectionModel().getSelectedItem().toString());
 
         vBox.getChildren().addAll(studentLabel,degreeField,degreeBox,fieldOfStudyLabel,fieldOfStudyBox,studentInfo);
         studentTab.setText("STUDENT INFORMATION");
@@ -199,7 +221,12 @@ public class Sisu extends Application {
         ObservableList<Module> observableListOptions = FXCollections.observableList(options);
         fieldOfStudyBox.setItems(observableListOptions);
         fieldOfStudyBox.setOnAction(eh);
-        fieldOfStudyBox.getSelectionModel().selectFirst();
+
+        if (existingProgramme){
+            fieldOfStudyBox.getSelectionModel().select(student.getProgrammes().get(0));
+        } else {
+            fieldOfStudyBox.getSelectionModel().selectFirst();
+        }
     }
 
     public void createStudiesTab(Module degreeProgramme){
@@ -272,7 +299,12 @@ public class Sisu extends Application {
     public void addCheckBox(CourseUnit course){
         CheckBox checkBox = new CheckBox(course.getName());
 
+        if (course.getSelected()){
+            checkBox.setSelected(true);
+        }
+
         // check if checkbox was previously selected
+        /*
         TreeItem item = (TreeItem) treeView.getSelectionModel().getSelectedItem();
         for (Object object : item.getChildren()){
             TreeItem treeItem = (TreeItem) object;
@@ -280,6 +312,8 @@ public class Sisu extends Application {
                 checkBox.setSelected(true);
             }
         }
+
+         */
         checkBox.setOnAction(eh);
         checkBoxes.getChildren().add(checkBox);
 
@@ -319,7 +353,16 @@ public class Sisu extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws InterruptedException {
+    public void start(Stage stage) throws InterruptedException, IOException {
+
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent e) {
+                save();
+                Platform.exit();
+                System.exit(0);
+            }
+        });
 
         LoginScreen login = new LoginScreen();
 
@@ -327,7 +370,16 @@ public class Sisu extends Application {
             Thread.sleep(50);
         }
 
-        student = new Student(login.getFirstName(), login.getLastName(), login.getStudentID());
+        if (sr.exists(login.getStudentID())){
+            student = sr.read(login.getStudentID());
+        } else {
+            student = new Student(login.getFirstName(), login.getLastName(), login.getStudentID());
+
+        }
+        if (!student.getProgrammes().isEmpty()){
+            existingProgramme = true;
+        }
+
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
             @Override
@@ -337,17 +389,32 @@ public class Sisu extends Application {
                     public void run() {
                         LoadingScreen loadingScreen = new LoadingScreen();
 
+                        // Using AnchorPane to set the save button to always be on bottom right of the screen
+                        AnchorPane root = new AnchorPane();
+                        AnchorPane.setTopAnchor(tabPane,0.0);
+                        AnchorPane.setLeftAnchor(tabPane,0.0);
+                        AnchorPane.setRightAnchor(tabPane,0.0);
+                        AnchorPane.setBottomAnchor(saveButton,20.0);
+                        AnchorPane.setRightAnchor(saveButton, 20.0);
+
+
+                        saveButton.setTooltip(new Tooltip("Save current status"));
+                        saveButton.setPrefSize(100,50);
+                        saveButton.setOnAction(eh);
                         tabPane = new TabPane();
                         tabPane.setMinSize(1500,800);
-                        createStudentTab2();
+                        createStudentTab();
                         createStudiesTab((Module)fieldOfStudyBox.getSelectionModel().getSelectedItem());
                         studentTab.setClosable(false);
                         studiesTab.setClosable(false);
                         tabPane.getTabs().add(studentTab);
                         tabPane.getTabs().add(studiesTab);
 
+
                         stage.setTitle("SISU");
-                        Scene scene = new Scene(tabPane);
+
+                        root.getChildren().addAll(tabPane,saveButton);
+                        Scene scene = new Scene(root);
                         stage.setScene(scene);
 
                         loadingScreen.setVisible(false);
@@ -359,6 +426,20 @@ public class Sisu extends Application {
         };
         worker.execute();
 
+    }
+
+    // save current progress
+    public void save(){
+        StudentWriter sw = new StudentWriter();
+        try {
+            DegreeProgramme dp = (DegreeProgramme) treeView.getRoot().getValue();
+            String groupId = degreeGroupIdPairs.get(degreeBox.getSelectionModel().getSelectedItem().toString());
+            student.addDegree(groupId);
+            student.addProgramme(dp);
+            sw.write(student);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
