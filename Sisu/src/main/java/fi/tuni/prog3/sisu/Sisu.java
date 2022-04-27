@@ -178,7 +178,7 @@ public class Sisu extends Application {
         degreeBox = new ComboBox(oDegrees);
         if (existingProgramme){
             for (Map.Entry<String, String> entry : degreeGroupIdPairs.entrySet()){
-                if (Objects.equals(entry.getValue(), student.getDegrees().get(0))){
+                if (Objects.equals(entry.getValue(), student.getDegreeId())){
                     degreeBox.getSelectionModel().select(entry.getKey());
                 }
             }
@@ -222,7 +222,7 @@ public class Sisu extends Application {
         fieldOfStudyBox.setOnAction(eh);
 
         if (existingProgramme){
-            fieldOfStudyBox.getSelectionModel().select(student.getProgrammes().get(0));
+            fieldOfStudyBox.getSelectionModel().select(student.getProgramme());
         } else {
             fieldOfStudyBox.getSelectionModel().selectFirst();
         }
@@ -386,7 +386,7 @@ public class Sisu extends Application {
             student = new Student(login.getFirstName(), login.getLastName(), login.getStudentID());
 
         }
-        if (!student.getProgrammes().isEmpty()){
+        if (student.hasProgramme()){
             existingProgramme = true;
         }
 
@@ -444,7 +444,8 @@ public class Sisu extends Application {
         try {
             DegreeProgramme dp = (DegreeProgramme) treeView.getRoot().getValue();
             String groupId = degreeGroupIdPairs.get(degreeBox.getSelectionModel().getSelectedItem().toString());
-            student.setSingleProgramme(dp);
+            student.setDegreeId(groupId);
+            student.setProgramme(dp);
             sw.write(student);
         } catch (IOException e) {
             e.printStackTrace();

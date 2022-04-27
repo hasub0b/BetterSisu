@@ -29,7 +29,7 @@ public class StudentReaderTest {
         String origFirstName = "First";
         String origLastName = "Last";
         String origId = "Something";
-        Student original = new Student(origFirstName, origLastName, origId, new ArrayList<>());
+        Student original = new Student(origFirstName, origLastName, origId, DP);
 
         StudentWriter sw = new StudentWriter();
         String tdString = tempDir.toString();
@@ -60,9 +60,9 @@ public class StudentReaderTest {
     @Test
     public void testReadAll() {
         DegreeProgramme dptwo = new DegreeProgramme(2, "dp kaks", "dp kaks id", "dp kaks gid");
-        Student first = new Student("one", "lastName", "1", new ArrayList<>(List.of(DP, dptwo)));
-        Student second = new Student("second", "lastName", "2", new ArrayList<>());
-        Student third = new Student("third", "lastName", "3", new ArrayList<>());
+        Student first = new Student("one", "lastName", "1", dptwo);
+        Student second = new Student("second", "lastName", "2", dptwo);
+        Student third = new Student("third", "lastName", "3", DP);
 
         ArrayList<Student> testCollection = new ArrayList<>(List.of(first, second, third));
 
@@ -94,10 +94,10 @@ public class StudentReaderTest {
         for (int i = 0; i < testCollection.size(); i++) {
             /*
             assertTrue(resultCollection.get(i).equals(testCollection.get(i)));
-            CAUSES PROBLEM IN PIPELINE */ 
+            CAUSES PROBLEM IN PIPELINE */
         }
     }
-    
+
     @Test
     public void testExists() {
         StudentReader sr = new StudentReader();
@@ -106,7 +106,7 @@ public class StudentReaderTest {
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
-        
+
         Student s = new Student("a", "b", "123");
         StudentWriter sw = new StudentWriter();
         try {
@@ -114,7 +114,7 @@ public class StudentReaderTest {
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
-        
+
         try {
             assertTrue(sr.exists(tempDir.toString(), "123"));
         } catch (IOException e) {
