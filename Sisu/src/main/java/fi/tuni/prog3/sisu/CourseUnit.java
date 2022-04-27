@@ -9,19 +9,29 @@ package fi.tuni.prog3.sisu;
 
 public class CourseUnit {
 
-    String id;
-    String courseUnitGroupId;
-    String name;
-    String code;
-    int minCredits;
-    int maxCredits;
+    private String id;
+    private String courseUnitGroupId;
+    private String name;
+    private String code;
+    private int minCredits;
+    private int maxCredits;
     
     // addtl info
-    String content;
-    String prerequisite;
-    String outcome;
-    String material;
+    private String content;
+    private String prerequisite;
+    private String outcome;
+    private String material;
 
+    /**
+     * Constructs a CourseUnit
+     *
+     * @param id Course ID
+     * @param groupId Course GroupID
+     * @param name Course name
+     * @param code Course code
+     * @param minCredits Minimum credits
+     * @param maxCredits Maximum credits
+     */
     public CourseUnit(String id, String groupId, String name, String code, int minCredits, int maxCredits) {
         this.id = id;
         this.courseUnitGroupId = groupId;
@@ -35,22 +45,74 @@ public class CourseUnit {
         this.material = null;
     }
 
+    /**
+     * Returns ID of this course
+     *
+     * @return Course ID
+     */
     public String getId() {return id;}
 
+    /**
+     * Returns GroupID of this course
+     *
+     * @return Course GroupID
+     */
     public String getCourseUnitGroupId() {return courseUnitGroupId;}
 
+    /**
+     * Returns GroupID of this course
+     *
+     * @return Course GroupID
+     */
     public String getName() {return name;}
 
+    /**
+     * Returns name of this course
+     *
+     * @return Course name
+     */
     public String getCode() {return code;}
 
+    /**
+     * Returns code of this course
+     *
+     * @return Course code
+     */
     public int getMinCredits() {return minCredits;}
-    
+
+    /**
+     * Returns minimum credits of this course
+     *
+     * @return Minimum credits
+     */
     public int getMaxCredits() {return maxCredits;}
 
-    // addtl info
+    /**
+     * Returns content of this course
+     *
+     * @return Course content
+     */
     public String getContent() {return content;}
+
+    /**
+     * Returns prerequisite of this course
+     *
+     * @return Course prerequisite
+     */
     public String getPrerequisite() {return prerequisite;}
+
+    /**
+     * Returns outcome of this course
+     *
+     * @return Course outcome
+     */
     public String getOutcome() {return outcome;}
+
+    /**
+     * Returns material of this course
+     *
+     * @return Course material
+     */
     public String getMaterial() {return material;}
     public void setContent(String content) {this.content = content;}
     public void setPrerequisite(String prereq) {this.prerequisite = prereq;}
@@ -60,7 +122,13 @@ public class CourseUnit {
     public Boolean hasPrerequisite() {return (prerequisite != null);}
     public Boolean hasOutcome() {return (outcome != null);}
     public Boolean hasMaterial() {return (material != null);}
-    
+
+
+    /**
+     * Formats a course as "Course: courseName"
+     *
+     * @return String representation of this course
+     */
     @Override
     public String toString() {
         return "COURSE: " + getName();
