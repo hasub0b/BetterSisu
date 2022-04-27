@@ -68,12 +68,8 @@ public class CourseUnit {
         return selected;
     }
 
-    public void setSelected(){
-        if (selected) {
-            selected = false;
-        } else {
-            selected = true;
-        }
+    public void setSelected(boolean bool){
+        selected = bool;
     }
     
     @Override
