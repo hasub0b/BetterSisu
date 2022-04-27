@@ -14,7 +14,7 @@ import java.util.Objects;
  * Asks user for a full name and student ID
  * Closes when user has given all needed information
  *
- * @author Hasu
+ * @author Aleski Hasu
  */
 public class LoginScreen {
 
