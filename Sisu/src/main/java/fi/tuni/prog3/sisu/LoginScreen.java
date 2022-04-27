@@ -48,6 +48,7 @@ public class LoginScreen {
     public void showLogin() throws IOException {
 
         final JFrame frame = new JFrame("SISU LOGIN");
+        frame.setResizable(false);
 
         // frame size and location on the screen
         int width = 300;
@@ -59,7 +60,7 @@ public class LoginScreen {
         frame.setLocation(x,y);
 
         // create necessary components
-        JLabel lblStudents = new JLabel("Saved Students: ");
+        //JLabel lblStudents = new JLabel("Saved Students: ");
         JLabel lblFirstName = new JLabel("First Name:");
         JTextField firstName = new JTextField(20);
         lblFirstName.setLabelFor(firstName);
@@ -125,13 +126,13 @@ public class LoginScreen {
 
         Collection<Student> savedStudents = new StudentReader().readAll();
         JComboBox<Student> students = new JComboBox<Student>();
+        students.setPrototypeDisplayValue(new Student("                     ","                    ","                    "));
+
         students.setToolTipText("Choose an existing student");
         // if there's no saved student used we use different JComboBox so the ActionListener won't be set
         if (savedStudents.isEmpty()){
             JComboBox<String> studentsString = new JComboBox<String>();
             studentsString.addItem("NO SAVED STUDENTS FOUND");
-            lblStudents.setLabelFor(studentsString);
-            panel.add(lblStudents);
             panel.add(studentsString);
 
         } else {
@@ -139,8 +140,6 @@ public class LoginScreen {
                 students.addItem(stud);
             }
 
-            lblStudents.setLabelFor(students);
-            panel.add(lblStudents);
             panel.add(students);
 
         }
@@ -158,8 +157,6 @@ public class LoginScreen {
                 studentId.setText(selectedStudent.getStudentId());
             }
         });
-
-
 
         // add components to the panel
         panel.add(lblFirstName);
