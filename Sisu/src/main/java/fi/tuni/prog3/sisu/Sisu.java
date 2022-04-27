@@ -304,6 +304,10 @@ public class Sisu extends Application {
 
     public void addCheckBox(CourseUnit course){
         CheckBox checkBox = new CheckBox(course.getName());
+        Tooltip courseInfo = new Tooltip(
+                String.format("Name: %s | Code: %s | Credits: %s",
+                        course.getName(),course.getCode(),course.getMaxCredits()));
+        checkBox.setTooltip(courseInfo);
 
         if (course.getSelected()){
             checkBox.setSelected(true);
