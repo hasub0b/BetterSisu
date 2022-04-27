@@ -13,11 +13,12 @@ import javax.swing.*;
  *
  * JWindow displayed when the program loads something e.g. fields of study after user chose degree
  *
- * @author Hasu
+ * @author Aleksi Hasu
  */
 
 public class SmallLoadingScreen extends JWindow {
 
+    // Main label to be displayed and updated
     JLabel welcomeText = new JLabel("Loading...", JLabel.CENTER);
 
 
@@ -25,11 +26,13 @@ public class SmallLoadingScreen extends JWindow {
         new SmallLoadingScreen();
     }
 
+
     public SmallLoadingScreen() {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
+                    // set look and feel
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                     ex.printStackTrace();
@@ -39,8 +42,12 @@ public class SmallLoadingScreen extends JWindow {
         });
     }
 
+    /**
+     * Create a new JPanel and display it
+     */
     public void showScreen() {
 
+        // root panel
         JPanel content = (JPanel) getContentPane();
 
         // Set the window's bounds, centering the window
@@ -51,12 +58,13 @@ public class SmallLoadingScreen extends JWindow {
         int y = (screen.height - height) / 2;
         setBounds(x, y, width, height);
 
-        // Create loading screen
+        // Create loading screen label
         JLabel label = new JLabel();
         welcomeText = new JLabel("Loading...", JLabel.CENTER);
-
         content.add(label, BorderLayout.CENTER);
         label.setLayout(new GridBagLayout());
+
+        // Set font
         Font font = welcomeText.getFont();
         welcomeText.setFont(font.deriveFont(Font.BOLD, 28f));
 
@@ -65,13 +73,13 @@ public class SmallLoadingScreen extends JWindow {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         label.add(welcomeText,gbc);
 
-
         // Display it
         setVisible(true);
         toFront();
         new ResourceLoader().execute();
     }
 
+    // SwingWorker class to update the text
     public class ResourceLoader extends SwingWorker<Object, Object> {
 
         @Override
