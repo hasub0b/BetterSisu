@@ -141,6 +141,7 @@ public class LoginScreen {
         // if there's no saved students, we use different JComboBox so the ActionListener won't be set
         if (savedStudents.isEmpty()){
             JComboBox<String> studentsString = new JComboBox<String>();
+            studentsString.setPrototypeDisplayValue("                                                                   ");
             studentsString.addItem("NO SAVED STUDENTS FOUND");
             panel.add(studentsString);
         } else {
