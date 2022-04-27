@@ -32,6 +32,7 @@ public class LoginScreen {
             @Override
             public void run() {
                 try {
+                    // set look and feel
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                     ex.printStackTrace();
@@ -45,8 +46,12 @@ public class LoginScreen {
         });
     }
 
+    /**
+     * Create a new JFrame and display it
+     */
     public void showLogin() throws IOException {
 
+        // Root frame
         final JFrame frame = new JFrame("SISU LOGIN");
         frame.setResizable(false);
 
@@ -59,8 +64,7 @@ public class LoginScreen {
         int y = (screen.height - height) / 2;
         frame.setLocation(x,y);
 
-        // create necessary components
-        //JLabel lblStudents = new JLabel("Saved Students: ");
+        // create displayed components
         JLabel lblFirstName = new JLabel("First Name:");
         JTextField firstName = new JTextField(20);
         lblFirstName.setLabelFor(firstName);
@@ -74,13 +78,16 @@ public class LoginScreen {
         enter.setToolTipText("Continue to Sisu");
         JLabel information = new JLabel("Enter all details above before continuing");
         information.setLabelFor(enter);
-
         JLabel message = new JLabel();
+
+        // set red color font for error message
         Font font = message.getFont();
         message.setFont(font.deriveFont(Font.BOLD, 12));
         message.setForeground(Color.RED);
 
+        // StudentReader help to check valid user inputs
         StudentReader sr = new StudentReader();
+
         // Handle button action
         enter.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -92,6 +99,7 @@ public class LoginScreen {
                     message.setText("Student ID can't be empty!");
                 }else {
                     try {
+                        // check if studentID exists already and if the given name matches saved name
                         if(sr.exists(studentId.getText())){
                             Student foundStudent = sr.read(studentId.getText());
                             if (Objects.equals(lastName.getText(), foundStudent.getLastName()) && Objects.equals(firstName.getText(), foundStudent.getFirstName())){
@@ -113,6 +121,7 @@ public class LoginScreen {
             }
         } );
 
+        // main panel to add components to
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
@@ -123,28 +132,25 @@ public class LoginScreen {
         new StudentWriter().write(new Student("Matti", "Meikalainen", "000-001"));
          */
 
-
+        // Get all saved students and create a JComboBox
         Collection<Student> savedStudents = new StudentReader().readAll();
         JComboBox<Student> students = new JComboBox<Student>();
         students.setPrototypeDisplayValue(new Student("                     ","                    ","                    "));
-
         students.setToolTipText("Choose an existing student");
-        // if there's no saved student used we use different JComboBox so the ActionListener won't be set
+
+        // if there's no saved students, we use different JComboBox so the ActionListener won't be set
         if (savedStudents.isEmpty()){
             JComboBox<String> studentsString = new JComboBox<String>();
             studentsString.addItem("NO SAVED STUDENTS FOUND");
             panel.add(studentsString);
-
         } else {
             for (Student stud : savedStudents){
                 students.addItem(stud);
             }
-
             panel.add(students);
-
         }
 
-        // handle the event when the user is selects an item from the drop-down list.
+        // handle the event when the user is selects an item from the drop-down list on the JComboBox.
         students.addActionListener(new ActionListener() {
 
             @Override
@@ -168,8 +174,8 @@ public class LoginScreen {
         panel.add(enter);
         panel.add(information);
         panel.add(message);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
 
@@ -190,15 +196,38 @@ public class LoginScreen {
 
     }
 
+    /**
+     * Returns boolean value whether valid login is entered or not
+     *
+     * @return Boolean
+     */
     public boolean isLoginEntered() {
         return loginEntered;
     }
+
+    /**
+     * Returns String entered in firstName JTextField
+     *
+     * @return String first name
+     */
     public String getFirstName() {
         return firstName;
     }
+
+    /**
+     * Returns String entered in lastName JTextField
+     *
+     * @return String last name
+     */
     public String getLastName() {
         return lastName;
     }
+
+    /**
+     * Returns String entered in studentID JTextField
+     *
+     * @return String student ID
+     */
     public String getStudentID() {
         return studentId;
     }
