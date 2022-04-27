@@ -125,6 +125,13 @@ public class Student implements Comparable<Student> {
         this.programmes = programmes;
     }
 
+    public void setSingleProgramme(DegreeProgramme programme) {
+        this.programmes = new ArrayList();
+        this.addProgramme(programme);
+        this.degrees = new ArrayList();
+        this.addDegree(programme.getGroupId());
+    }
+    
     /**
      * Adds a single DegreeProgramme to be associated with this student.
      *

@@ -434,8 +434,7 @@ public class Sisu extends Application {
         try {
             DegreeProgramme dp = (DegreeProgramme) treeView.getRoot().getValue();
             String groupId = degreeGroupIdPairs.get(degreeBox.getSelectionModel().getSelectedItem().toString());
-            student.addDegree(groupId);
-            student.addProgramme(dp);
+            student.setSingleProgramme(dp);
             sw.write(student);
         } catch (IOException e) {
             e.printStackTrace();
