@@ -73,17 +73,16 @@ public class Sisu extends Application {
                             TreeItem treeItem = new TreeItem<>(course);
                             selected.getChildren().add(treeItem);
                             handleCredits(selected,"add",course.getMaxCredits());
-                            course.setSelected();
+                            course.setSelected(true);
                         } else {
                             for (Object ob : selected.getChildren()) {
                                 TreeItem treeItem = (TreeItem) ob;
                                 try {
                                     CourseUnit cu = (CourseUnit) treeItem.getValue();
-
                                     if (Objects.equals(chk.getText(), cu.getName())) {
                                         selected.getChildren().remove(ob);
                                         handleCredits(selected,"remove", cu.getMaxCredits());
-                                        course.setSelected();
+                                        course.setSelected(false);
                                         break;
                                     }
                                 } catch (ClassCastException ignored){}
@@ -107,7 +106,7 @@ public class Sisu extends Application {
                                     smallLoadingScreen.setVisible(true);
                                     smallLoadingScreen.setAlwaysOnTop(true);
                                     createFieldOfStudyOptions2(degreeBox.getSelectionModel().getSelectedItem().toString());
-                                    smallLoadingScreen.setVisible(false);
+                                    smallLoadingScreen.dispose();
 
                                 }
                             });
@@ -282,6 +281,13 @@ public class Sisu extends Application {
         for (Module subModule : md.getSubModules()){
             rootItem.getChildren().add(getTree(subModule));
         }
+
+        for (CourseUnit course : md.getSubUnits()){
+            if (course.getSelected()){
+                TreeItem treeItem = new TreeItem<>(course);
+                rootItem.getChildren().add(treeItem);
+            }
+        }
         return rootItem;
     }
 
@@ -298,6 +304,10 @@ public class Sisu extends Application {
 
     public void addCheckBox(CourseUnit course){
         CheckBox checkBox = new CheckBox(course.getName());
+        Tooltip courseInfo = new Tooltip(
+                String.format("Name: %s | Code: %s | Credits: %s",
+                        course.getName(),course.getCode(),course.getMaxCredits()));
+        checkBox.setTooltip(courseInfo);
 
         if (course.getSelected()){
             checkBox.setSelected(true);
@@ -417,7 +427,7 @@ public class Sisu extends Application {
                         Scene scene = new Scene(root);
                         stage.setScene(scene);
 
-                        loadingScreen.setVisible(false);
+                        loadingScreen.dispose();
                         stage.show();
                     }
                 });
