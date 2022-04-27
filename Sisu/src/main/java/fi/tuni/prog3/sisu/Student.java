@@ -15,6 +15,7 @@ public class Student implements Comparable<Student> {
     private String lastName;
     private final String studentId;
     private ArrayList<DegreeProgramme> programmes;
+    private ArrayList<String> degrees = new ArrayList<String>();
 
     /**
      * Constructs a Student with given parameters.
@@ -115,6 +116,13 @@ public class Student implements Comparable<Student> {
         this.programmes = programmes;
     }
 
+    public void setSingleProgramme(DegreeProgramme programme) {
+        this.programmes = new ArrayList();
+        this.addProgramme(programme);
+        this.degrees = new ArrayList();
+        this.addDegree(programme.getGroupId());
+    }
+    
     /**
      * Adds a single DegreeProgramme to be associated with this student.
      *
@@ -164,5 +172,12 @@ public class Student implements Comparable<Student> {
         return (lastName.equalsIgnoreCase(other.getLastName())
                 && firstName.equalsIgnoreCase(other.getFirstName())
                 && studentId.equalsIgnoreCase(other.getStudentId()));
+    }
+
+    public void addDegree(String groupID) {
+        this.degrees.add(groupID);
+    }
+    public ArrayList<String> getDegrees(){
+        return degrees;
     }
 }

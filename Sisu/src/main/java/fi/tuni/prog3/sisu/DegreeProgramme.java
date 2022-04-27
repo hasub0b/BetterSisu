@@ -9,19 +9,38 @@ package fi.tuni.prog3.sisu;
 public class DegreeProgramme extends Module {
     int maxCredits;
 
-    /**
-     * 
-     * @param maxCredits maximum amount of credits attainable
-     * @param name name of the degree programme
-     * @param id id of the degree programme
-     * @param groupId groupId of the degree programme
-     */
+
+
+    int currentCredits;
+
     public DegreeProgramme(int maxCredits, String name, String id, String groupId) {
         super(name, id, groupId);
         this.maxCredits = maxCredits;
+        this.currentCredits = 0;
     }
+
     
     public int getMaxCredits() {
         return maxCredits;
     };
+
+    public int getCurrentCredits() { return currentCredits; }
+
+    public void addCredits(int credits){
+        currentCredits += credits;
+    }
+
+    public void removeCredits(int credits){
+        currentCredits -= credits;
+
+        // Shouldn't happen but in a case something went wrong
+        if (currentCredits < 0){
+            currentCredits = 0;
+        }
+    }
+
+    @Override
+    public String toString(){
+        return getName() + " " + getCurrentCredits() +" / " + getMaxCredits() + "cr";
+    }
 }
