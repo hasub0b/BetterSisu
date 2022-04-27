@@ -13,7 +13,7 @@ public class Student implements Comparable<Student> {
 
     private String firstName;
     private String lastName;
-    private String studentId;
+    private final String studentId;
     private ArrayList<DegreeProgramme> programmes;
 
     /**
@@ -104,15 +104,6 @@ public class Student implements Comparable<Student> {
      */
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    /**
-     * Sets this students student id to given String.
-     *
-     * @param studentId student id to change to
-     */
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
     }
 
     /**
