@@ -124,14 +124,29 @@ public class StudentReader {
         Collection<Student> students = readAll(DEFAULT_PATH);
         return students;
     }
-    
+
+    /**
+     * Checks whether a Student with given id exists under saveddata/students/.
+     *
+     * @param studentId id for Student to find
+     * @return true if found, false otherwise
+     * @throws IOException when unable to perform read operation
+     */
     public Boolean exists(String studentId) throws IOException {
         return exists(DEFAULT_PATH, studentId);
     }
-    
+
+    /**
+     * Checks whether Student exists in specified directory.
+     *
+     * @param directory directory to search
+     * @param studentId id for Student to find
+     * @return true if found, false otherwise
+     * @throws IOException when unable to perform read operation
+     */
     public Boolean exists(String directory, String studentId) throws IOException {
         Collection<Student> students = readAll(directory);
-        for (Student s: students) {
+        for (Student s : students) {
             if (s.getStudentId().equals(studentId)) {
                 return true;
             }
