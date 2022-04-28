@@ -8,9 +8,6 @@ package fi.tuni.prog3.sisu;
  */
 public class DegreeProgramme extends Module {
     int maxCredits;
-
-
-
     int currentCredits;
 
     public DegreeProgramme(int maxCredits, String name, String id, String groupId) {
@@ -19,17 +16,32 @@ public class DegreeProgramme extends Module {
         this.currentCredits = 0;
     }
 
-    
+    /**
+     * Getter for maximum credits
+     * @return maximum credits
+     */
     public int getMaxCredits() {
         return maxCredits;
     };
 
+    /**
+     * Getter for credits
+     * @return current credits
+     */
     public int getCurrentCredits() { return currentCredits; }
 
+    /**
+     * Add credits to Degree
+     * @param credits amount of credits to add
+     */
     public void addCredits(int credits){
         currentCredits += credits;
     }
 
+    /**
+     * Decrease credits amount by specified credits
+     * @param credits amount of credits to remove
+     */
     public void removeCredits(int credits){
         currentCredits -= credits;
 
