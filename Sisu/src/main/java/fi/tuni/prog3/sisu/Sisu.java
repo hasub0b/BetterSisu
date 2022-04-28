@@ -28,7 +28,7 @@ import java.util.List;
  * A Program used to investigate the degree structures of
  * study programmes in Tampere University.
  *
- * @author Hasu
+ * @author Aleksi Hasu
  */
 
 public class Sisu extends Application {
@@ -70,11 +70,13 @@ public class Sisu extends Application {
                 for (CourseUnit course : courses) {
                     if (Objects.equals(chk.getText(), course.getName())) {
                         if (chk.isSelected()) {
+                            // if CheckBox is selected, add course as a TreeItem and add credits
                             TreeItem treeItem = new TreeItem<>(course);
                             selected.getChildren().add(treeItem);
                             handleCredits(selected,"add",course.getMaxCredits());
                             course.setSelected(true);
                         } else {
+                            // CheckBox was deselected, get the TreeItem representing the course and remove it + credits
                             for (Object ob : selected.getChildren()) {
                                 TreeItem treeItem = (TreeItem) ob;
                                 try {
@@ -102,10 +104,15 @@ public class Sisu extends Application {
                                 @Override
                                 public void run() {
 
+                                    // Show a LoadingScreen
                                     SmallLoadingScreen smallLoadingScreen = new SmallLoadingScreen();
                                     smallLoadingScreen.setVisible(true);
                                     smallLoadingScreen.setAlwaysOnTop(true);
+
+                                    // Update fieldsOfStudyBox
                                     createFieldOfStudyOptions2(degreeBox.getSelectionModel().getSelectedItem().toString());
+
+                                    // Close the LoadingScreen
                                     smallLoadingScreen.dispose();
 
                                 }
