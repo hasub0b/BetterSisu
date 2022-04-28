@@ -1,7 +1,5 @@
 package fi.tuni.prog3.sisu;
 
-import java.util.ArrayList;
-
 /**
  * Describes a student and their chosen DegreeProgramme. Has a case-insensitive
  * natural ordering by last name, followed by first name and finally by student
@@ -83,7 +81,7 @@ public class Student implements Comparable<Student> {
     }
 
     /**
-     * Returns an ArrayList of the DegreeProgrammes chosen by this student.
+     * Returns the DegreeProgramme chosen by this student.
      *
      * @return programmes of this student
      */
@@ -160,14 +158,29 @@ public class Student implements Comparable<Student> {
                 && studentId.equalsIgnoreCase(other.getStudentId()));
     }
 
+    /**
+     * Sets this Students degreeId to given String.
+     *
+     * @param groupID groupId of the degree
+     */
     public void setDegreeId(String groupID) {
         this.degreeId = groupID;
     }
 
+    /**
+     * Get the degreeId for this Student.
+     *
+     * @return String of the degreeId
+     */
     public String getDegreeId() {
         return degreeId;
     }
-    
+
+    /**
+     * Checks whether this student has a DegreeProgramme.
+     *
+     * @return true if yes, otherwise false
+     */
     public boolean hasProgramme() {
         return (programme != null);
     }
