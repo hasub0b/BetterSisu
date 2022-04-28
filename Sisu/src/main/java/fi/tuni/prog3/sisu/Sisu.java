@@ -149,31 +149,38 @@ public class Sisu extends Application {
         }
     };
 
+    /**
+     *
+     * Update the first tab where degree and field of study can be chosen by the user, also display info about current Student
+     */
     public void createStudentTab(){
 
+        // Set fonts
         javafx.scene.text.Font font = new javafx.scene.text.Font(30f);
         javafx.scene.text.Font font1 = new javafx.scene.text.Font(20f);
-        // fields for students info
+
+        // fields for Students info
         VBox studentInfo = new VBox();
         studentInfo.setAlignment(Pos.BOTTOM_CENTER);
         Label firstName = new Label("First Name: " + student.getFirstName());
         Label lastName = new Label("Last Name: " + student.getLastName());
         Label studentID = new Label("Student ID: " + student.getStudentId());
         studentInfo.getChildren().addAll(firstName,lastName,studentID);
-
         VBox vBox = new VBox();
         Label studentLabel = new Label("Hey, " + student.getFirstName() + "!");
         studentLabel.setFont(font);
+
+        // Degrees
         Label degreeField = new Label("Choose a degree program:");
         degreeField.setFont(font1);
 
+        // Get all the degrees from Sisu with ModuleReader
         ArrayList<String> degrees = new ArrayList<>();
-
         degreeGroupIdPairs = mr.getDegreeGroupIdPairs();
         for (Map.Entry<String, String> entry : degreeGroupIdPairs.entrySet()){
             degrees.add(entry.getKey());
         }
-
+        // Transfer Arraylist to ObservableList and add it to the ComboBox
         ObservableList<String> oDegrees = FXCollections.observableArrayList(degrees);
         degreeBox = new ComboBox(oDegrees);
         if (existingProgramme){
@@ -187,20 +194,29 @@ public class Sisu extends Application {
         }
         degreeBox.setOnAction(eh);
 
+        // Fields of study
         Label fieldOfStudyLabel = new Label("Choose field:");
         fieldOfStudyLabel.setFont(font1);
-
         createFieldOfStudyOptions2(degreeBox.getSelectionModel().getSelectedItem().toString());
 
+        // Add everything to studentTab
         vBox.getChildren().addAll(studentLabel,degreeField,degreeBox,fieldOfStudyLabel,fieldOfStudyBox,studentInfo);
         studentTab.setText("STUDENT INFORMATION");
         studentTab.setContent(vBox);
         vBox.setAlignment(Pos.CENTER);
     }
 
+    /**
+     * Update fieldsOfStudyBox with given degree name
+     *
+     * @param name Name of the currently selected DegreeProgramme
+     */
     public void createFieldOfStudyOptions2(String name){
+        // Get groupId with given name
         String groupId = degreeGroupIdPairs.get(name);
         Module degree = mr.buildModule(groupId);
+
+        // Create ArrayList of possible fields under the given degree
         ArrayList<Module> options = new ArrayList<>();
         for (Module subModule : degree.getSubModules()){
 
@@ -217,10 +233,12 @@ public class Sisu extends Application {
         if (options.isEmpty()){
             options.add(degree);
         }
+        // ArrayList to ObservableList and add it to ComboBox
         ObservableList<Module> observableListOptions = FXCollections.observableList(options);
         fieldOfStudyBox.setItems(observableListOptions);
         fieldOfStudyBox.setOnAction(eh);
 
+        // Choose witch option is selected by default
         if (existingProgramme){
             fieldOfStudyBox.getSelectionModel().select(student.getProgramme());
         } else {
@@ -228,6 +246,12 @@ public class Sisu extends Application {
         }
     }
 
+    /**
+     *
+     * Update the second tab containing the TreeView and course selection
+     *
+     * @param degreeProgramme The DegreeProgramme chosen on the fieldsOfStudyBox
+     */
     public void createStudiesTab(Module degreeProgramme){
         HBox studiesTabHBox = new HBox();
 
@@ -238,7 +262,9 @@ public class Sisu extends Application {
         // searchbar
         VBox studiesTabRightSide = new VBox();
         searchbar = new TextField();
+        // Add listener to the TextField
         searchbar.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Update shown CheckBoxes depending on the text entered to the TextField
             checkBoxes.getChildren().clear();
             for (CourseUnit course : courses){
                 if (course.getName().toLowerCase(Locale.ROOT).contains(newValue.toLowerCase(Locale.ROOT))){
@@ -248,20 +274,30 @@ public class Sisu extends Application {
         });
         studiesTabRightSide.getChildren().add(searchbar);
 
-        // checkboxes
+        // Checkboxes
         checkBoxes.getChildren().clear();
         studiesTabRightSide.getChildren().add(checkBoxes);
 
+        // Add everything to studiesTab
         studiesTabHBox.getChildren().addAll(treeView,studiesTabRightSide);
         studiesTab.setText("DEGREE STRUCTURE");
         studiesTab.setContent(studiesTabHBox);
     }
 
+    /**
+     * Create the TreeView component
+     *
+     * @param dp DegreeProgramme chosen on the fieldsOfStudyBox
+     * @return TreeView of the degree structure
+     */
     public TreeView createTreeView(DegreeProgramme dp){
+
+        // Set DegreeProgramme as root and get rest of the tree
         TreeView treeView = new TreeView();
         TreeItem rootItem = getTree(dp);
         treeView.setRoot(rootItem);
 
+        // Listener to update shown CheckBoxes based on selected TreeItem
         treeView.getSelectionModel().selectedItemProperty().addListener((v, oldValue, newValue) -> {
             courses.clear();
             checkBoxes.getChildren().clear();
@@ -274,14 +310,21 @@ public class Sisu extends Application {
         return treeView;
     }
 
-    // recursive function used to get TreeItem and it's children
+    /**
+     * Recursive function used to get TreeItem and it's children
+     *
+     * @param md Module to be transfer to TreeItem and whose submodules and subunits will be added as TreeItems under it
+     * @return TreeItem of the given Module
+     */
     public TreeItem getTree(Module md){
         TreeItem rootItem = new TreeItem(md);
 
+        // Add all SubModules
         for (Module subModule : md.getSubModules()){
             rootItem.getChildren().add(getTree(subModule));
         }
 
+        // Add all CourseUnits
         for (CourseUnit course : md.getSubUnits()){
             if (course.getSelected()){
                 TreeItem treeItem = new TreeItem<>(course);
@@ -291,7 +334,11 @@ public class Sisu extends Application {
         return rootItem;
     }
 
-    // Get CourseUnits of currently selected StudyModule
+    /**
+     * Get CourseUnits of currently selected StudyModule
+     * And update them to courses
+     *
+     */
     public void getCourses(){
         courses.clear();
         try {
@@ -302,33 +349,35 @@ public class Sisu extends Application {
         }
     }
 
+    /**
+     * Add CheckBox of the given course
+     *
+     * @param course CourseUnit
+     */
     public void addCheckBox(CourseUnit course){
+        // Add CheckBox and ToolTip
         CheckBox checkBox = new CheckBox(course.getName());
         Tooltip courseInfo = new Tooltip(
                 String.format("Name: %s | Code: %s | Credits: %s",
                         course.getName(),course.getCode(),course.getMaxCredits()));
         checkBox.setTooltip(courseInfo);
 
+        // Set CheckBox selection based on if the course was previously selected
         if (course.getSelected()){
             checkBox.setSelected(true);
         }
 
-        // check if checkbox was previously selected
-        /*
-        TreeItem item = (TreeItem) treeView.getSelectionModel().getSelectedItem();
-        for (Object object : item.getChildren()){
-            TreeItem treeItem = (TreeItem) object;
-            if (Objects.equals(course, treeItem.getValue())){
-                checkBox.setSelected(true);
-            }
-        }
-
-         */
         checkBox.setOnAction(eh);
         checkBoxes.getChildren().add(checkBox);
-
     }
 
+    /**
+     * Update DegreePrograms currentCredits when CourseUnit under it was selected
+     *
+     * @param treeItem TreeItem of the DegreeProgramme to be updated
+     * @param operand String, "add" if course was selected and credits added, "remove" if course was deselected and credits removed
+     * @param credits int credits of the course
+     */
     public void handleCredits(TreeItem treeItem, String operand, int credits){
         switch (operand){
             case "add":
@@ -362,9 +411,17 @@ public class Sisu extends Application {
         }
     }
 
+    /**
+     * Starts the main displayed stage
+     *
+     * @param stage Stage to be displayed
+     * @throws InterruptedException thrown if a Thread is interrupted
+     * @throws IOException thrown if there is a problem while reading or writing JSON-files
+     */
     @Override
     public void start(Stage stage) throws InterruptedException, IOException {
 
+        // Set action to be performed when user tries to close the program
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent e) {
@@ -374,12 +431,13 @@ public class Sisu extends Application {
             }
         });
 
+        // Show login screen
         LoginScreen login = new LoginScreen();
-
         while (!login.isLoginEntered()){
             Thread.sleep(50);
         }
 
+        // Login entered, create a Student or get a saved one
         if (sr.exists(login.getStudentID())){
             student = sr.read(login.getStudentID());
         } else {
@@ -390,14 +448,18 @@ public class Sisu extends Application {
             existingProgramme = true;
         }
 
-
+        // SwingWorker used to MultiThread
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
             @Override
             protected Void doInBackground() throws Exception {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+
+                        // Show LoadingScreen
                         LoadingScreen loadingScreen = new LoadingScreen();
+
+                        // Start to prepare main program window
 
                         // Using AnchorPane to set the save button to always be on bottom right of the screen
                         AnchorPane root = new AnchorPane();
@@ -407,10 +469,12 @@ public class Sisu extends Application {
                         AnchorPane.setBottomAnchor(saveButton,20.0);
                         AnchorPane.setRightAnchor(saveButton, 20.0);
 
-
+                        // Setup Save-button
                         saveButton.setTooltip(new Tooltip("Save current status"));
                         saveButton.setPrefSize(100,50);
                         saveButton.setOnAction(eh);
+
+                        // Setup TabPane and all the Tabs
                         tabPane = new TabPane();
                         tabPane.setMinSize(1500,800);
                         createStudentTab();
@@ -420,14 +484,16 @@ public class Sisu extends Application {
                         tabPane.getTabs().add(studentTab);
                         tabPane.getTabs().add(studiesTab);
 
-
-                        stage.setTitle("SISU");
-
+                        // Add all to AnchorPane, Create a new scene and add it to the stage
                         root.getChildren().addAll(tabPane,saveButton);
                         Scene scene = new Scene(root);
+                        stage.setTitle("SISU");
                         stage.setScene(scene);
 
+                        // Close the LoadingScreen
                         loadingScreen.dispose();
+
+                        // Finally, show the stage
                         stage.show();
                     }
                 });
@@ -438,12 +504,20 @@ public class Sisu extends Application {
 
     }
 
-    // save current progress
+    //
+
+    /**
+     * Save current degree and selected courses using StudentWriter to a JSON-file
+     */
     public void save(){
         StudentWriter sw = new StudentWriter();
         try {
+            // The DegreeProgramme chosen on the fieldsOfStudyBox
             DegreeProgramme dp = (DegreeProgramme) treeView.getRoot().getValue();
+            // Save the DegreeProgramme on the degreeBox in a case there were multiple options on the fieldsOfStudyBox
             String groupId = degreeGroupIdPairs.get(degreeBox.getSelectionModel().getSelectedItem().toString());
+
+            // Set all to the current Student and write the Student to a file
             student.setDegreeId(groupId);
             student.setProgramme(dp);
             sw.write(student);
