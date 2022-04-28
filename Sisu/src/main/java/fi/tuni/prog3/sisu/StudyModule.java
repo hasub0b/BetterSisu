@@ -19,22 +19,40 @@ public class StudyModule extends DegreeProgramme {
         complete = false;
     }
     
+    /**
+     * Set module as completed
+     */
     public void completeModule() {
         complete = true;
     }
     
+    /**
+     * Undo module completion
+     */
     public void cancelModuleCompletion() {
         complete = false;
     }
 
+    /**
+     * Getter for module completion status
+     * @return True if module is complete, false else
+     */
     public Boolean isComplete() {
         return complete;
     }
 
+    /**
+     * Get requirements for module
+     * @return ArrayList of requirements in string format
+     */
     public ArrayList<String> getRequirements() {
         return requirements;
     }
 
+    /**
+     * Get array of organizer ids
+     * @return ArrayList of organizer ids
+     */
     public ArrayList<String> getOrganizers() {
         return organizers;
     }
