@@ -3,6 +3,7 @@ package fi.tuni.prog3.sisu;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,8 @@ public class StudentReaderTest {
 
         ArrayList<Student> testCollection = new ArrayList<>(List.of(first, second, third));
 
-        String tdString = tempDir.toString();
+        Path subFolder = tempDir.resolve("readall");
+        String tdString = subFolder.toString();
 
         StudentWriter sw = new StudentWriter();
         try {
@@ -88,13 +90,11 @@ public class StudentReaderTest {
         }
 
         assertNotNull(resultCollection);
-        // should be 4 total json files thanks to other test
-        assertTrue(resultCollection.size() >= testCollection.size());
-        // id's for first, second, third mean they are read before original (see line 33)
+        assertTrue(resultCollection.size() == testCollection.size());
+        Collections.sort(testCollection);
+        Collections.sort(resultCollection);
         for (int i = 0; i < testCollection.size(); i++) {
-            /*
             assertTrue(resultCollection.get(i).equals(testCollection.get(i)));
-            CAUSES PROBLEM IN PIPELINE */
         }
     }
 
