@@ -26,8 +26,8 @@ public class StudentTest {
 
     @BeforeEach
     public void setUp() {
-        ArrayList<DegreeProgramme> programmes = new ArrayList<>(List.of(FIRST_PROGRAMME, SECOND_PROGRAMME));
-        testStudent = new Student(FIRST_NAME, LAST_NAME, STUDENT_ID, programmes);
+//        ArrayList<DegreeProgramme> programmes = new ArrayList<>(List.of(FIRST_PROGRAMME, SECOND_PROGRAMME));
+        testStudent = new Student(FIRST_NAME, LAST_NAME, STUDENT_ID, FIRST_PROGRAMME);
     }
 
     @Test
@@ -46,19 +46,19 @@ public class StudentTest {
     }
 
     @Test
-    public void testGetProgrammes() {
-        ArrayList<DegreeProgramme> result = testStudent.getProgrammes();
-        assertTrue(result.size() == 2);
+    public void testGetProgramme() {
+        DegreeProgramme result = testStudent.getProgramme();
+//        assertTrue(result.size() == 2);
         assertAll("first DegreeProgramme equalities",
-                () -> assertEquals(result.get(0).getName(), FIRST_PROGRAMME.getName()),
-                () -> assertEquals(result.get(0).getId(), FIRST_PROGRAMME.getId()),
-                () -> assertEquals(result.get(0).getGroupId(), FIRST_PROGRAMME.getGroupId())
+                () -> assertEquals(result.getName(), FIRST_PROGRAMME.getName()),
+                () -> assertEquals(result.getId(), FIRST_PROGRAMME.getId()),
+                () -> assertEquals(result.getGroupId(), FIRST_PROGRAMME.getGroupId())
         );
-        assertAll("second DegreeProgramme equalities",
-                () -> assertEquals(result.get(1).getName(), SECOND_PROGRAMME.getName()),
-                () -> assertEquals(result.get(1).getId(), SECOND_PROGRAMME.getId()),
-                () -> assertEquals(result.get(1).getGroupId(), SECOND_PROGRAMME.getGroupId())
-        );
+//        assertAll("second DegreeProgramme equalities",
+//                () -> assertEquals(result.get(1).getName(), SECOND_PROGRAMME.getName()),
+//                () -> assertEquals(result.get(1).getId(), SECOND_PROGRAMME.getId()),
+//                () -> assertEquals(result.get(1).getGroupId(), SECOND_PROGRAMME.getGroupId())
+//        );
     }
 
     @Test
@@ -77,24 +77,23 @@ public class StudentTest {
 
     @Test
     public void testSetProgrammes() {
-        ArrayList<DegreeProgramme> newList = new ArrayList<>(List.of(SECOND_PROGRAMME));
-        testStudent.setProgrammes(newList);
-        ArrayList<DegreeProgramme> afterSet = testStudent.getProgrammes();
-        assertTrue(afterSet.size() == 1);
+//        ArrayList<DegreeProgramme> newList = new ArrayList<>(List.of(SECOND_PROGRAMME));
+        testStudent.setProgramme(SECOND_PROGRAMME);
+        DegreeProgramme afterSet = testStudent.getProgramme();
+//        assertTrue(afterSet.size() == 1);
         assertAll(
-                () -> assertEquals(afterSet.get(0).getName(), SECOND_PROGRAMME.getName()),
-                () -> assertEquals(afterSet.get(0).getId(), SECOND_PROGRAMME.getId()),
-                () -> assertEquals(afterSet.get(0).getGroupId(), SECOND_PROGRAMME.getGroupId())
+                () -> assertEquals(afterSet.getName(), SECOND_PROGRAMME.getName()),
+                () -> assertEquals(afterSet.getId(), SECOND_PROGRAMME.getId()),
+                () -> assertEquals(afterSet.getGroupId(), SECOND_PROGRAMME.getGroupId())
         );
     }
 
-    @Test
-    public void testAddProgramme() {
-        DegreeProgramme third = new DegreeProgramme(1, "asd", "fgh", "jkl");
-        testStudent.addProgramme(third);
-        assertTrue(testStudent.getProgrammes().size() == 3);
-    }
-
+//    @Test
+//    public void testAddProgramme() {
+//        DegreeProgramme third = new DegreeProgramme(1, "asd", "fgh", "jkl");
+//        testStudent.addProgramme(third);
+//        assertTrue(testStudent.getProgrammes().size() == 3);
+//    }
     @Test
     public void testToString() {
         String expected = String.format("%s, %s (%s)", LAST_NAME, FIRST_NAME, STUDENT_ID);

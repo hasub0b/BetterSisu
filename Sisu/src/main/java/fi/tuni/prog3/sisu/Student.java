@@ -3,9 +3,9 @@ package fi.tuni.prog3.sisu;
 import java.util.ArrayList;
 
 /**
- * Describes a student and their chosen DegreeProgramme(s). Has a
- * case-insensitive natural ordering by last name, followed by first name and
- * finally by student id.
+ * Describes a student and their chosen DegreeProgramme. Has a case-insensitive
+ * natural ordering by last name, followed by first name and finally by student
+ * id.
  *
  * @author Jyri
  */
@@ -14,8 +14,8 @@ public class Student implements Comparable<Student> {
     private String firstName;
     private String lastName;
     private final String studentId;
-    private ArrayList<DegreeProgramme> programmes;
-    private ArrayList<String> degrees = new ArrayList<String>();
+    private DegreeProgramme programme;
+    private String degreeId;
 
     /**
      * Constructs a Student with given parameters.
@@ -23,24 +23,25 @@ public class Student implements Comparable<Student> {
      * @param firstName First name
      * @param lastName Last name
      * @param studentId Identification number
-     * @param programmes DegreeProgrammes associated with the student
+     * @param programme DegreeProgramme associated with the student
      */
-    public Student(String firstName, String lastName, String studentId, ArrayList<DegreeProgramme> programmes) {
+    public Student(String firstName, String lastName, String studentId, DegreeProgramme programme) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.studentId = studentId;
-        this.programmes = programmes;
+        this.programme = programme;
+        this.degreeId = "";
     }
 
     /**
-     * Constructs a Student without chosen programmes.
+     * Constructs a Student without a chosen programme.
      *
      * @param firstName First name
      * @param lastName Last name
      * @param studentId Identification number
      */
     public Student(String firstName, String lastName, String studentId) {
-        this(firstName, lastName, studentId, new ArrayList<DegreeProgramme>());
+        this(firstName, lastName, studentId, null);
     }
 
     /**
@@ -50,7 +51,8 @@ public class Student implements Comparable<Student> {
         this.firstName = new String();
         this.lastName = new String();
         this.studentId = new String();
-        this.programmes = new ArrayList<>();
+        this.programme = null;
+        this.degreeId = "";
     }
 
     /**
@@ -85,8 +87,8 @@ public class Student implements Comparable<Student> {
      *
      * @return programmes of this student
      */
-    public ArrayList<DegreeProgramme> getProgrammes() {
-        return programmes;
+    public DegreeProgramme getProgramme() {
+        return programme;
     }
 
     /**
@@ -110,26 +112,10 @@ public class Student implements Comparable<Student> {
     /**
      * Sets this students chosen programmes to given.
      *
-     * @param programmes programmes to be associated with this student
+     * @param programme programme to be associated with this student
      */
-    public void setProgrammes(ArrayList<DegreeProgramme> programmes) {
-        this.programmes = programmes;
-    }
-
-    public void setSingleProgramme(DegreeProgramme programme) {
-        this.programmes = new ArrayList();
-        this.addProgramme(programme);
-        this.degrees = new ArrayList();
-        this.addDegree(programme.getGroupId());
-    }
-    
-    /**
-     * Adds a single DegreeProgramme to be associated with this student.
-     *
-     * @param programme
-     */
-    public void addProgramme(DegreeProgramme programme) {
-        programmes.add(programme);
+    public void setProgramme(DegreeProgramme programme) {
+        this.programme = programme;
     }
 
     /**
@@ -174,10 +160,15 @@ public class Student implements Comparable<Student> {
                 && studentId.equalsIgnoreCase(other.getStudentId()));
     }
 
-    public void addDegree(String groupID) {
-        this.degrees.add(groupID);
+    public void setDegreeId(String groupID) {
+        this.degreeId = groupID;
     }
-    public ArrayList<String> getDegrees(){
-        return degrees;
+
+    public String getDegreeId() {
+        return degreeId;
+    }
+    
+    public boolean hasProgramme() {
+        return (programme != null);
     }
 }

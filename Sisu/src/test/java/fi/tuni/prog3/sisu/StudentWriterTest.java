@@ -30,9 +30,9 @@ public class StudentWriterTest {
      */
     @Test
     public void testWrite() {
-        DegreeProgramme dptwo = new DegreeProgramme(2, "dp kaks", "dp kaks id", "dp kaks gid");
+//        DegreeProgramme dptwo = new DegreeProgramme(2, "dp kaks", "dp kaks id", "dp kaks gid");
         String testStudentId = "h123";
-        Student test = new Student("etunimi", "sukunimi", testStudentId, new ArrayList<>(List.of(DP, dptwo)));
+        Student test = new Student("etunimi", "sukunimi", testStudentId, DP);
         StudentWriter sw = new StudentWriter();
         String tdString = tempDir.toString();
         try {
@@ -49,10 +49,11 @@ public class StudentWriterTest {
     @Test
     public void testWriteAll() {
         String testStudentId = "h123";
-        Student test = new Student("etunimi", "sukunimi", testStudentId, new ArrayList<>(List.of(DP)));
+        Student test = new Student("etunimi", "sukunimi", testStudentId, DP);
 
         String anotherStudentId = "K098";
-        Student anotherStudent = new Student("first", "last", anotherStudentId, new ArrayList<>());
+        DegreeProgramme dptwo = new DegreeProgramme(2, "dp kaks", "dp kaks id", "dp kaks gid");
+        Student anotherStudent = new Student("first", "last", anotherStudentId, dptwo);
 
         Collection<Student> testStudents = new ArrayList<>(List.of(test, anotherStudent));
 
