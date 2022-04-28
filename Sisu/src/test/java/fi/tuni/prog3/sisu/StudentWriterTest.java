@@ -25,12 +25,8 @@ public class StudentWriterTest {
     public StudentWriterTest() {
     }
 
-    /**
-     * Test of write method, of class StudentWriter.
-     */
     @Test
     public void testWrite() {
-//        DegreeProgramme dptwo = new DegreeProgramme(2, "dp kaks", "dp kaks id", "dp kaks gid");
         String testStudentId = "h123";
         Student test = new Student("etunimi", "sukunimi", testStudentId, DP);
         StudentWriter sw = new StudentWriter();
